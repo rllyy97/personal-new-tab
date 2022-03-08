@@ -41,6 +41,26 @@ const linksSlice = createSlice({
             if (action.payload?.imageUrl) group.links[linkIndex].imageUrl = action.payload.imageUrl
         },
 
+        moveLinkData(state, action) {
+            const { fromGroupId, toGroupId, fromIndex, toIndex } = action.payload
+
+            const fromGroupIndex = state.linkGroups.findIndex(g => g.id === fromGroupId)
+            const toGroupIndex = state.linkGroups.findIndex(g => g.id === toGroupId)
+            if (fromGroupIndex === -1) return
+            if (toGroupIndex === -1) return
+            
+            const fromGroup = state.linkGroups[fromGroupIndex]
+            const toGroup = state.linkGroups[toGroupIndex]
+
+            const link = fromGroup.links.splice(fromIndex, 1)[0]
+            toGroup.links.splice(toIndex, 0, link)
+        },
+        moveLinkGroup(state, action) {
+            const { fromIndex, toIndex } = action.payload
+            const group = state.linkGroups.splice(fromIndex, 1)[0]
+            state.linkGroups.splice(toIndex, 0, group)
+        },
+
         removeLinkGroup(state, action) {
             const groupIndex = state.linkGroups.findIndex(g => g.id === action.payload.groupId)
             if (groupIndex === -1) return

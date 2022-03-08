@@ -5,6 +5,7 @@ import { AppStatusState } from './interface'
 const initialState: AppStatusState = {
   selectedGroupId: '',
   selectedLinkId: '',
+  draggedLinkId: '',
 }
 
 const appStatusSlice = createSlice({
@@ -13,6 +14,7 @@ const appStatusSlice = createSlice({
     reducers: {
         setSelectedGroupId(state, action) { state.selectedGroupId = action.payload },
         setSelectedLinkId(state, action) { state.selectedLinkId = action.payload },
+        setDraggedLinkId(state, action) { state.draggedLinkId = action.payload },
         clearSelectedIds(state) {
           state.selectedLinkId = ''
           state.selectedGroupId = ''

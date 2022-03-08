@@ -14,6 +14,8 @@ import AddIcon from '@mui/icons-material/Add'
 import { theme } from './theme'
 import { LinkSettingsModal } from './components/LinkSettingsModal'
 import { NewLinkGroup } from './EmptyData'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 function App() {
 
@@ -38,7 +40,12 @@ function App() {
   }, [])
 
   const saveData = () => {
-    let temp = { username, notes, backgroundColor, linkGroups }
+    const cleanedLinkGroups = linkGroups.map(group => ({
+      ...group, links: group.links.filter(link => link !== null)
+    }))
+    
+    let temp = { username, notes, backgroundColor, linkGroups: cleanedLinkGroups }
+
     localStorage.setItem('data', JSON.stringify(temp))
   }
   window.addEventListener('beforeunload', saveData)
@@ -50,30 +57,32 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <SiteWrapper backgroundColor={backgroundColor} textColor={textColor}>
-        <ContentWrapper>
-          <h1 style={{opacity: '0.3', marginBottom: '16px'}}>// New Tab</h1>
-          {/* <h3>
-            Welcome&nbsp;
-            <InvisibleInput value={username} onChange={(e) => setUsername(e.target.value)}/>
-          </h3> */}
-          <Clock />
+      <DndProvider backend={HTML5Backend}>
+        <SiteWrapper backgroundColor={backgroundColor} textColor={textColor}>
+          <ContentWrapper>
+            <h1 style={{opacity: '0.3', marginBottom: '16px'}}>// New Tab</h1>
+            {/* <h3>
+              Welcome&nbsp;
+              <InvisibleInput value={username} onChange={(e) => setUsername(e.target.value)}/>
+            </h3> */}
+            <Clock />
 
-          {linkGroups.map((group) => <LinkGroupTile linkGroup={group} />)}
+            {linkGroups.map((group, index) => <LinkGroupTile key={group.id} index={index} linkGroup={group} />)}
 
-          <FlexDiv>
-            <Button 
-              variant="contained"
-              onClick={() => dispatch(linkActions.addLinkGroup({linkGroup: NewLinkGroup()}))}
-              startIcon={<AddIcon />}
-            >
-              Add Group
-            </Button>
-          </FlexDiv>
-        </ContentWrapper>
+            <FlexDiv>
+              <Button 
+                variant="contained"
+                onClick={() => dispatch(linkActions.addLinkGroup({linkGroup: NewLinkGroup()}))}
+                startIcon={<AddIcon />}
+              >
+                Add Group
+              </Button>
+            </FlexDiv>
+          </ContentWrapper>
 
-        <LinkSettingsModal />
-      </SiteWrapper>
+          <LinkSettingsModal />
+        </SiteWrapper>
+      </DndProvider>
     </ThemeProvider>
   )
 }

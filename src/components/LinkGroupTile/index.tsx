@@ -1,6 +1,6 @@
 import { LinkGroup } from '../../types'
 
-import LinkTile from '../LinkTile'
+import LinkTile, { LinkTileProps } from '../LinkTile'
 import { EmptyGroupWarningContainer, GroupContainer, GroupTitle, LinksContainer, TitleBackground } from './styles'
 
 import CancelIcon from '@mui/icons-material/Cancel'
@@ -13,21 +13,26 @@ import { useDispatch } from 'react-redux'
 import colors from '../../colors'
 import { Button } from '@mui/material'
 import { InvisibleInput } from '../../GlobalComponents'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { NewLinkData } from '../../EmptyData'
 
 import { actions as linkActions } from '../../app/links/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 import { actions as modalActions } from '../../app/modals/slice'
 import { getDomain } from '../../Utilities'
+import { DropTargetMonitor, useDrop } from 'react-dnd'
+import { Identifier } from 'typescript'
+import { group } from 'console'
+import { NativeTypes } from 'react-dnd-html5-backend'
 
 
-interface LinkGroupProps {
+export interface LinkGroupProps {
+    index: number;
     linkGroup: LinkGroup;
 }
 
 const LinkGroupTile = (props: LinkGroupProps) => {
-    const { linkGroup } = props
+    const { index, linkGroup } = props
     const { id, title, links, minimized = false } = linkGroup
     
     const dispatch = useDispatch()
@@ -45,24 +50,67 @@ const LinkGroupTile = (props: LinkGroupProps) => {
         dispatch(modalActions.toggleLinkSettingsModal())
     }
 
-    const [dragOver, setDragOver] = useState(false)
-
-    const urlDrop = async (e: any) => {
-        e.stopPropagation()
-        e.preventDefault()
-        setDragOver(false)
-        const url = e.dataTransfer.getData('text')
-        let newUrl = (url as string).startsWith('http') ? url : `http://${url}`
+    const addUrl = async (url: string) => {
+        let newUrl = url.startsWith('http') ? url : `http://${url}`
         const newLinkData = NewLinkData()
         newLinkData.title = getDomain(newUrl)
         newLinkData.url = newUrl
         dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
     } 
 
+    ///
+
+    const linksContainerRef = useRef<HTMLDivElement>(null)
+    const [{ handlerId }, dropLinks] = useDrop<
+      LinkTileProps,
+      void,
+      { handlerId: Identifier | null }
+    >({
+      accept: ["LINK"],
+      collect: (monitor: any) => {
+        return { handlerId: monitor.getHandlerId() }
+      },
+      hover(item: LinkTileProps, monitor) {
+        if (!rootRef.current) return
+        const dragGroupId = item.groupId
+        const hoverGroupId = id
+        const dragIndex = item.index
+        const hoverIndex = links.length
+        if (dragGroupId === hoverGroupId) return
+        dispatch(linkActions.moveLinkData({
+          fromGroupId: dragGroupId,
+          toGroupId: hoverGroupId,
+          fromIndex: dragIndex,
+          toIndex: links.length
+        }))
+        item.index = hoverIndex
+        item.groupId = hoverGroupId
+      },
+    })
+
+    const rootRef = useRef<HTMLDivElement>(null)
+    const [{ canDrop, isOver }, dropUrl] = useDrop(() => ({
+      accept: [NativeTypes.URL],
+      drop: (item: { urls: string[] }) => {
+        console.log(item)
+        addUrl(item.urls[0])
+      },
+      collect: (monitor: DropTargetMonitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(), 
+      }),
+    }))
+
+    dropUrl(rootRef)
+    dropLinks(linksContainerRef)
+
+    ///
+
     return (
         <GroupContainer
+            ref={rootRef}
             id={id}
-            className={dragOver ? 'drag' : ''}
+            className={canDrop && isOver ? 'drag' : ''}
             style={minimized ? {padding: '16px'} : {}}
         >
             {/* This first title is invisible, it's just to have the reactive white background */}
@@ -80,21 +128,11 @@ const LinkGroupTile = (props: LinkGroupProps) => {
 
             {!minimized && (
                 links.length !== 0 ? (
-                    <LinksContainer
-                        onDragEnter={(e) => setDragOver(true)}
-                        onDragLeave={(e) => setDragOver(false)}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={urlDrop}
-                    >
-                        {links.map(link => <LinkTile groupId={id} linkData={link}/>)}
+                    <LinksContainer ref={linksContainerRef}>
+                        {links.filter(x => x != null).map((link, index) => <LinkTile key={link.id} groupId={id} index={index} linkData={link}/>)}
                     </LinksContainer>
                 ) : (
-                    <EmptyGroupWarningContainer
-                        onDragEnter={(e) => setDragOver(true)}
-                        onDragLeave={(e) => setDragOver(false)}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={urlDrop}
-                    >
+                    <EmptyGroupWarningContainer ref={linksContainerRef}>
                         <Button
                         startIcon={<AddCircleIcon />}
                         onClick={addLink}
