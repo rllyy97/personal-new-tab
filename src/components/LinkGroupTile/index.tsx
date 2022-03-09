@@ -20,7 +20,7 @@ import { actions as linkActions } from '../../app/links/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 import { actions as modalActions } from '../../app/modals/slice'
 import { getDomain } from '../../Utilities'
-import { DropTargetMonitor, useDrop } from 'react-dnd'
+import { DragSourceMonitor, DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { Identifier } from 'typescript'
 import { group } from 'console'
 import { NativeTypes } from 'react-dnd-html5-backend'
@@ -58,10 +58,11 @@ const LinkGroupTile = (props: LinkGroupProps) => {
         dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
     } 
 
-    ///
+    // DND ////////////////////////////////////////////////////////////////////
 
+    // Dropping Links
     const linksContainerRef = useRef<HTMLDivElement>(null)
-    const [{ handlerId }, dropLinks] = useDrop<
+    const [linksHandler, dropLinks] = useDrop<
       LinkTileProps,
       void,
       { handlerId: Identifier | null }
@@ -88,6 +89,7 @@ const LinkGroupTile = (props: LinkGroupProps) => {
       },
     })
 
+    // Dropping Groups
     const rootRef = useRef<HTMLDivElement>(null)
     const [{ canDrop, isOver }, dropUrl] = useDrop(() => ({
       accept: [NativeTypes.URL],
@@ -101,17 +103,48 @@ const LinkGroupTile = (props: LinkGroupProps) => {
       }),
     }))
 
+    // Dropping Groups
+    const [groupHandler, dropGroup] = useDrop<
+      LinkTileProps,
+      void,
+      { handlerId: Identifier | null }
+    >({
+        accept: "GROUP",
+        collect: (monitor: any) => ({ handlerId: monitor.getHandlerId() }),
+        hover: (item: LinkTileProps, monitor) => {
+            if (!rootRef.current) return
+            const fromIndex = item.index
+            const toIndex = index
+            if (fromIndex === toIndex) return
+            dispatch(linkActions.moveLinkGroup({fromIndex, toIndex}))
+            item.index = toIndex
+        },
+    })
+
+    // Dragging Groups
+    const [{ isDragging }, dragGroup] = useDrag({
+      type: "GROUP",
+      item: () => ({ id, index }),
+      collect: (monitor: DragSourceMonitor) => ({isDragging: monitor.isDragging()}),
+    })
+
     dropUrl(rootRef)
+    dragGroup(dropGroup(rootRef))
     dropLinks(linksContainerRef)
 
     ///
+
+    const rootStyle = {
+        opacity: isDragging ? 0 : 1,
+        padding: minimized ? '16px' : '',
+    }
 
     return (
         <GroupContainer
             ref={rootRef}
             id={id}
             className={canDrop && isOver ? 'drag' : ''}
-            style={minimized ? {padding: '16px'} : {}}
+            style={rootStyle}
         >
             {/* This first title is invisible, it's just to have the reactive white background */}
             <TitleBackground>
