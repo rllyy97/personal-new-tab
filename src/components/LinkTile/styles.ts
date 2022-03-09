@@ -11,9 +11,25 @@ export const LinkContainer = styled.div`
     border-radius: 12px;
     padding: 8px;
     cursor: pointer;
+    width: 112px;
+    background: #80808020;
 
     &:hover {
-        background: #80808016;
+    }
+
+    &.mini {
+        padding: 6px;
+        flex-direction: row;
+        width: 188px;
+        gap: 16px;
+        padding-right: 16px;
+        justify-content: flex-start;
+
+        &>img {
+            min-width: 36px;
+            width: 36px;
+            height: 36px;
+        }
     }
 `
 

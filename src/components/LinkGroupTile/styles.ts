@@ -8,7 +8,7 @@ export const GroupContainer = styled.div`
     gap: 16px;    
     border: 2px solid #cccccc4D;
     border-radius: 8px;
-    padding: 32px 16px 24px;
+    padding: 32px 32px 24px;
 
     transition: all 0.2s;
 
@@ -39,7 +39,7 @@ export const LinksContainer = styled.div`
     flex-wrap: wrap;
     gap: 16px;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 `
 
 export const EmptyGroupWarningContainer = styled.div`

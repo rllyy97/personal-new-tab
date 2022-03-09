@@ -8,6 +8,7 @@ export const NewLinkGroup = (): LinkGroup => ({
     title: 'New Group',
     links: [],
     minimized: false,
+    tileStyle: 'normal',
 })
 
 export const NewLinkData = (): LinkData => ({

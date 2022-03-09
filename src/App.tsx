@@ -16,6 +16,7 @@ import { LinkSettingsModal } from './components/LinkSettingsModal'
 import { NewLinkGroup } from './EmptyData'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { GroupSettingsModal } from './components/GroupSettingsModal'
 
 function App() {
 
@@ -81,6 +82,7 @@ function App() {
           </ContentWrapper>
 
           <LinkSettingsModal />
+          <GroupSettingsModal />
         </SiteWrapper>
       </DndProvider>
     </ThemeProvider>

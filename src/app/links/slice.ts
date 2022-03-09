@@ -25,9 +25,12 @@ const linksSlice = createSlice({
             const groupIndex = state.linkGroups.findIndex(g => g.id === action.payload.groupId)
             if (groupIndex === -1) return
             // Set data
-            if (action.payload?.title) state.linkGroups[groupIndex].title = action.payload.title
+            if (action.payload?.title !== undefined)
+                state.linkGroups[groupIndex].title = action.payload.title
             if (action.payload?.minimized !== undefined)
                 state.linkGroups[groupIndex].minimized = action.payload.minimized
+            if (action.payload?.tileStyle !== undefined)
+                state.linkGroups[groupIndex].tileStyle = action.payload.tileStyle
         },
         updateLinkData(state, action) {
             const groupIndex = state.linkGroups.findIndex(g => g.id === action.payload.groupId)

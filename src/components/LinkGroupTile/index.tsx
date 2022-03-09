@@ -33,7 +33,7 @@ export interface LinkGroupProps {
 
 const LinkGroupTile = (props: LinkGroupProps) => {
     const { index, linkGroup } = props
-    const { id, title, links, minimized = false } = linkGroup
+    const { id, title, links, minimized = false, tileStyle = 'normal' } = linkGroup
     
     const dispatch = useDispatch()
     
@@ -57,6 +57,11 @@ const LinkGroupTile = (props: LinkGroupProps) => {
         newLinkData.url = newUrl
         dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
     } 
+
+    const openGroupSettings = () => {
+        dispatch(appStatusActions.setSelectedGroupId(id))
+        dispatch(modalActions.toggleGroupSettingsModal())
+    }
 
     // DND ////////////////////////////////////////////////////////////////////
 
@@ -89,7 +94,7 @@ const LinkGroupTile = (props: LinkGroupProps) => {
       },
     })
 
-    // Dropping Groups
+    // Dropping URLs
     const rootRef = useRef<HTMLDivElement>(null)
     const [{ canDrop, isOver }, dropUrl] = useDrop(() => ({
       accept: [NativeTypes.URL],
@@ -162,7 +167,7 @@ const LinkGroupTile = (props: LinkGroupProps) => {
             {!minimized && (
                 links.length !== 0 ? (
                     <LinksContainer ref={linksContainerRef}>
-                        {links.filter(x => x != null).map((link, index) => <LinkTile key={link.id} groupId={id} index={index} linkData={link}/>)}
+                        {links.filter(x => x != null).map((link, index) => <LinkTile key={link.id} groupId={id} index={index} linkData={link} tileStyle={tileStyle} />)}
                     </LinksContainer>
                 ) : (
                     <EmptyGroupWarningContainer ref={linksContainerRef}>
@@ -193,6 +198,12 @@ const LinkGroupTile = (props: LinkGroupProps) => {
                 style={{marginRight: '72px'}}
                 icon={<AddCircleIcon style={{fill: colors.green}} />}
                 onClick={addLink}
+            />
+            <CircleButton
+                className='tr'
+                style={{marginRight: '108px'}}
+                icon={<BuildCircleIcon style={{fill: colors.grey}} />}
+                onClick={openGroupSettings}
             />
         </GroupContainer>
     )

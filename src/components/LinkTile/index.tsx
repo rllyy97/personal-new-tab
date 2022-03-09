@@ -1,4 +1,4 @@
-import { LinkData } from '../../types'
+import { LinkData, TileStyle } from '../../types'
 import { LinkContainer, LinkImg, LinkTitle } from './styles'
 
 import { getFavicon } from '../../Utilities'
@@ -22,10 +22,11 @@ export interface LinkTileProps {
   groupId: string;
   index: number;
   linkData: LinkData;
+  tileStyle?: TileStyle;
 }
 
 const LinkTile = (props: LinkTileProps) => {
-  const { groupId, index, linkData } = props
+  const { groupId, index, linkData, tileStyle = 'normal' } = props
   const { id, title, url, imageUrl, visitCount } = linkData
 
   const dispatch = useDispatch()
@@ -92,6 +93,7 @@ const LinkTile = (props: LinkTileProps) => {
     <LinkContainer
       ref={ref}
       id={id}
+      className={tileStyle}
       onMouseEnter={() => setHasHover(true)}
       onMouseLeave={() => setHasHover(false)}
       style={{opacity: isDragging ? 0 : 1}}

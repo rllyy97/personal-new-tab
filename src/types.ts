@@ -11,6 +11,7 @@ export type LinkGroup = {
     title: string,
     links: LinkData[],
     minimized: boolean,
+    tileStyle: TileStyle,
 }
 
 export type LinkData = {
@@ -20,3 +21,7 @@ export type LinkData = {
     imageUrl: string
     visitCount: number
 }
+
+///
+
+export type TileStyle = 'mini' | 'normal'
