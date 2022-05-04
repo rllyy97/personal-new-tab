@@ -1,7 +1,7 @@
 {
   "homepage": "http://rllyy97.github.io/personal-new-tab",
   "name": "personal-new-tab",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.8.1",

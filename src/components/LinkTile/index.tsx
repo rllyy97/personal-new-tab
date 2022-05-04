@@ -35,15 +35,15 @@ const LinkTile = (props: LinkTileProps) => {
 
   const fallback = getFavicon(url)
 
-  const redirect = () => {
-    window.location.href = (url as string).startsWith('http') ? url : `http://${url}`
-  }
-
-  const deleteLink = () => {
+  const handleDelete = (e: any) => {
+    e.preventDefault()
+    e.stopPropagation()
     dispatch(linkActions.removeLinkData({groupId, linkId: id}))
   }
 
-  const openLinkSettings = () => {
+  const handleLinkSettings = (e: any) => {
+    e.preventDefault()
+    e.stopPropagation()
     dispatch(appStatusActions.setSelectedGroupId(groupId))
     dispatch(appStatusActions.setSelectedLinkId(id))
     dispatch(modalActions.toggleLinkSettingsModal())
@@ -90,34 +90,36 @@ const LinkTile = (props: LinkTileProps) => {
   ///
 
   return (
-    <LinkContainer
-      ref={ref}
-      id={id}
-      className={tileStyle}
-      onMouseEnter={() => setHasHover(true)}
-      onMouseLeave={() => setHasHover(false)}
-      style={{opacity: isDragging ? 0 : 1}}
-    >
-      <LinkImg alt='' src={imageUrl !== '' ? imageUrl : fallback} onClick={redirect} />
-      <FlexDiv style={{maxWidth: '96px'}}>
-        <LinkTitle>{title}</LinkTitle>
-      </FlexDiv>
-      {hasHover && (
-        <>
-          <CircleButton
-            className='tr'
-            icon={<CancelIcon style={{fill: colors.red}} />}
-            onClick={deleteLink}
-          />
-          <CircleButton
-            className='tr'
-            style={{marginRight: '28px'}}
-            icon={<BuildCircleIcon style={{fill: colors.blue}} />}
-            onClick={openLinkSettings}
-          />
-        </>
-      )}
-    </LinkContainer>
+    <a href={(url as string).startsWith('http') ? url : `http://${url}`} style={{"opacity": "0.999"}}>
+      <LinkContainer
+        ref={ref}
+        id={id}
+        className={tileStyle}
+        onMouseEnter={() => setHasHover(true)}
+        onMouseLeave={() => setHasHover(false)}
+        style={{opacity: isDragging ? 0 : 1}}
+      >
+          <LinkImg alt='' src={imageUrl !== '' ? imageUrl : fallback} />
+          <FlexDiv style={{maxWidth: '96px'}}>
+            <LinkTitle>{title}</LinkTitle>
+          </FlexDiv>
+          {hasHover && !isDragging && (
+            <>
+              <CircleButton
+                className='tr'
+                icon={<CancelIcon style={{fill: colors.red}} />}
+                onClick={handleDelete}
+              />
+              <CircleButton
+                className='tr'
+                style={{marginRight: '28px'}}
+                icon={<BuildCircleIcon style={{fill: colors.blue}} />}
+                onClick={handleLinkSettings}
+              />
+            </>
+          )}
+      </LinkContainer>
+    </a>
   )
 }
 

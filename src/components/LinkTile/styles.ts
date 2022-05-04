@@ -15,7 +15,9 @@ export const LinkContainer = styled.div`
     background: #80808020;
 
     &:hover {
+
     }
+
 
     &.mini {
         padding: 6px;
@@ -25,7 +27,7 @@ export const LinkContainer = styled.div`
         padding-right: 16px;
         justify-content: flex-start;
 
-        &>img {
+        img {
             min-width: 36px;
             width: 36px;
             height: 36px;
