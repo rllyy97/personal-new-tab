@@ -3,23 +3,29 @@ import { createSlice } from '@reduxjs/toolkit'
 import { AppStatusState } from './interface'
 
 const initialState: AppStatusState = {
+  selectedType: undefined,
   selectedGroupId: '',
   selectedLinkId: '',
   draggedLinkId: '',
+
+  contextMenuPos: null,
 }
 
 const appStatusSlice = createSlice({
-    name: 'modals',
-    initialState,
-    reducers: {
-        setSelectedGroupId(state, action) { state.selectedGroupId = action.payload },
-        setSelectedLinkId(state, action) { state.selectedLinkId = action.payload },
-        setDraggedLinkId(state, action) { state.draggedLinkId = action.payload },
-        clearSelectedIds(state) {
-          state.selectedLinkId = ''
-          state.selectedGroupId = ''
-        },
-    }
+  name: 'modals',
+  initialState,
+  reducers: {
+    setSelectedType(state: AppStatusState, action: any) { state.selectedType = action.payload },
+    setSelectedGroupId(state: AppStatusState, action: any) { state.selectedGroupId = action.payload },
+    setSelectedLinkId(state: AppStatusState, action: any) { state.selectedLinkId = action.payload },
+    setDraggedLinkId(state: AppStatusState, action: any) { state.draggedLinkId = action.payload },
+    clearSelectedIds(state: AppStatusState) {
+      state.selectedType = undefined
+      state.selectedLinkId = ''
+      state.selectedGroupId = ''
+    },
+    setContextMenuPos(state: AppStatusState, action: any) { state.contextMenuPos = action.payload },
+  }
 })
 
 export const { name, actions, reducer } = appStatusSlice

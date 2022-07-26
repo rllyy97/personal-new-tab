@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { NewLinkData, NewLinkGroup } from '../../EmptyData'
+import { LinkData } from '../../types'
 
 import { LinksState } from './interface'
 
@@ -24,24 +25,18 @@ const linksSlice = createSlice({
         updateLinkGroup(state, action) {
             const groupIndex = state.linkGroups.findIndex(g => g.id === action.payload.groupId)
             if (groupIndex === -1) return
-            // Set data
-            if (action.payload?.title !== undefined)
-                state.linkGroups[groupIndex].title = action.payload.title
-            if (action.payload?.minimized !== undefined)
-                state.linkGroups[groupIndex].minimized = action.payload.minimized
-            if (action.payload?.tileStyle !== undefined)
-                state.linkGroups[groupIndex].tileStyle = action.payload.tileStyle
+            Object.keys(action.payload).forEach(key => {
+                (state.linkGroups[groupIndex])[key] = action.payload[key]
+            });
         },
         updateLinkData(state, action) {
             const groupIndex = state.linkGroups.findIndex(g => g.id === action.payload.groupId)
             if (groupIndex === -1) return
-            const group = state.linkGroups[groupIndex]
-            const linkIndex = group.links.findIndex(l => l.id === action.payload.linkId)
+            const linkIndex = state.linkGroups[groupIndex].links.findIndex(l => l.id === action.payload.linkId)
             if (linkIndex === -1) return
-            // Set data
-            if (action.payload?.title) group.links[linkIndex].title = action.payload.title
-            if (action.payload?.url) group.links[linkIndex].url = action.payload.url
-            if (action.payload?.imageUrl) group.links[linkIndex].imageUrl = action.payload.imageUrl
+            Object.keys(action.payload).forEach(key => {
+                (state.linkGroups[groupIndex].links[linkIndex] as LinkData)[key] = action.payload[key]
+            });
         },
 
         moveLinkData(state, action) {

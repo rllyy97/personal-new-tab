@@ -14,7 +14,7 @@ export const SiteWrapper = styled.div<{backgroundColor: string, textColor: strin
 
 export const ContentWrapper = styled.div`
   position: relative;
-  max-width: 1080px;
+  max-width: 1120px;
   margin: 32px auto;
   display: flex;
   flex-direction: column;

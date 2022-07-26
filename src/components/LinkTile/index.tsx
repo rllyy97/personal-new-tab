@@ -16,6 +16,8 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import BuildCircleIcon from '@mui/icons-material/BuildCircle'
 import { useDrop, useDrag, DragSourceMonitor } from 'react-dnd'
 import { Identifier } from 'typescript'
+import PingStatusDot from './pingStatusDot'
+import ContextMenu, { HandleContext } from '../ContextMenu'
 
 
 export interface LinkTileProps {
@@ -23,10 +25,11 @@ export interface LinkTileProps {
   index: number;
   linkData: LinkData;
   tileStyle?: TileStyle;
+  hideTitle?: boolean;
 }
 
 const LinkTile = (props: LinkTileProps) => {
-  const { groupId, index, linkData, tileStyle = 'normal' } = props
+  const { groupId, index, linkData, tileStyle = 'normal', hideTitle = false } = props
   const { id, title, url, imageUrl, visitCount } = linkData
 
   const dispatch = useDispatch()
@@ -34,20 +37,6 @@ const LinkTile = (props: LinkTileProps) => {
   const [hasHover, setHasHover] = useState(false)
 
   const fallback = getFavicon(url)
-
-  const handleDelete = (e: any) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dispatch(linkActions.removeLinkData({groupId, linkId: id}))
-  }
-
-  const handleLinkSettings = (e: any) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dispatch(appStatusActions.setSelectedGroupId(groupId))
-    dispatch(appStatusActions.setSelectedLinkId(id))
-    dispatch(modalActions.toggleLinkSettingsModal())
-  }
 
   ///
 
@@ -87,36 +76,33 @@ const LinkTile = (props: LinkTileProps) => {
 
   drag(drop(ref))
 
+  const isLocalPort = url.includes('localhost:')
+
   ///
 
   return (
-    <a href={(url as string).startsWith('http') ? url : `http://${url}`} style={{"opacity": "0.999"}}>
+    <a
+      href={(url as string).startsWith('http') ? url : `http://${url}`}
+      onContextMenu={(e) => HandleContext(e, dispatch, 'link', groupId, id)}
+      style={{"opacity": "0.999"}}
+    >
       <LinkContainer
         ref={ref}
         id={id}
         className={tileStyle}
         onMouseEnter={() => setHasHover(true)}
         onMouseLeave={() => setHasHover(false)}
-        style={{opacity: isDragging ? 0 : 1}}
+        style={{opacity: isDragging ? 0 : 0.999}}
       >
-          <LinkImg alt='' src={imageUrl !== '' ? imageUrl : fallback} />
-          <FlexDiv style={{maxWidth: '96px'}}>
-            <LinkTitle>{title}</LinkTitle>
-          </FlexDiv>
-          {hasHover && !isDragging && (
-            <>
-              <CircleButton
-                className='tr'
-                icon={<CancelIcon style={{fill: colors.red}} />}
-                onClick={handleDelete}
-              />
-              <CircleButton
-                className='tr'
-                style={{marginRight: '28px'}}
-                icon={<BuildCircleIcon style={{fill: colors.blue}} />}
-                onClick={handleLinkSettings}
-              />
-            </>
+          {!isLocalPort ? (
+            <LinkImg alt='' src={imageUrl !== '' ? imageUrl : fallback} />
+          ) : (
+            <PingStatusDot url={url} />
+          )}
+          {!hideTitle && (
+            <FlexDiv style={{maxWidth: '96px'}}>
+              <LinkTitle>{title}</LinkTitle>
+            </FlexDiv>
           )}
       </LinkContainer>
     </a>

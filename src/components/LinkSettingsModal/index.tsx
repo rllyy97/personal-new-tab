@@ -1,10 +1,8 @@
 import { Dialog, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { getSelectedGroupId, getSelectedLinkId } from "../../app/appStatus/selectors"
-import { getLinkGroups } from "../../app/links/selectors"
+import { getSelectedGroupId, getSelectedLinkId, useSelectedLink } from "../../app/appStatus/selectors"
 import { isLinkSettingsOpen } from "../../app/modals/selectors"
-import { LinkData } from "../../types"
 
 import { actions as linkActions } from '../../app/links/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
@@ -24,21 +22,16 @@ export const LinkSettingsModal = () => {
     dispatch(modalActions.toggleLinkSettingsModal())
   }
 
-  const groupLinks = useSelector(getLinkGroups)
-
   const groupId = useSelector(getSelectedGroupId)
   const linkId = useSelector(getSelectedLinkId)
-  useEffect(() => {
-    setSelectedLinkData(groupLinks.find(group => group.id === groupId)?.links.find(link => link.id === linkId))
-  }, [groupId, linkId])
 
-  const [selectedLinkData, setSelectedLinkData] = useState<LinkData | undefined>(undefined)
+  const linkData = useSelectedLink();
 
   useEffect(() => {
-    setTempTitle(selectedLinkData?.title ?? '')
-    setTempUrl(selectedLinkData?.url ?? '')
-    setTempImageUrl(selectedLinkData?.imageUrl ?? '')
-  }, [selectedLinkData])
+    setTempTitle(linkData?.title ?? '')
+    setTempUrl(linkData?.url ?? '')
+    setTempImageUrl(linkData?.imageUrl ?? '')
+  }, [linkData])
 
   const [tempTitle, setTempTitle] = useState('')
   const updateTitle = () => dispatch(linkActions.updateLinkData({groupId, linkId, title: tempTitle}))

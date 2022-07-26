@@ -1,16 +1,16 @@
-import { Dialog, MenuItem, Select, TextField } from "@mui/material"
+import { Checkbox, Dialog, FormControlLabel, MenuItem, Select, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { getSelectedGroupId } from "../../app/appStatus/selectors"
-import { getLinkGroups } from "../../app/links/selectors"
 import { isGroupSettingsOpen } from "../../app/modals/selectors"
-import { LinkGroup } from "../../types"
+import { TILE_STYLES } from "../../types"
 
 import { actions as linkActions } from '../../app/links/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 import { actions as modalActions } from '../../app/modals/slice'
 
 import { StyledDialog } from "../../GlobalComponents"
+import { AppState } from "../../app/store"
 
 export const GroupSettingsModal = () => {
 
@@ -22,27 +22,22 @@ export const GroupSettingsModal = () => {
     dispatch(modalActions.toggleGroupSettingsModal())
   }
 
-  const groupLinks = useSelector(getLinkGroups)
   const groupId = useSelector(getSelectedGroupId)
-  const [selectedLinkGroup, setSelectedLinkGroup] = useState<LinkGroup | undefined>(undefined)
-  useEffect(() => {
-    setSelectedLinkGroup(groupLinks.find(group => group.id === groupId))
-  }, [groupId])
-
+  const group = useSelector((state: AppState) => state.links.linkGroups.find(g => g.id === groupId))
 
   useEffect(() => {
-    setTempTitle(selectedLinkGroup?.title ?? '')
-  }, [selectedLinkGroup])
+    setTempTitle(group?.title ?? '')
+  }, [group])
 
   const [tempTitle, setTempTitle] = useState('')
   const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId, title: tempTitle}))
   const updateTileStyle = (e: any) => dispatch(linkActions.updateLinkGroup({groupId, tileStyle: e.target.value}))
 
+  const checkClick = () => dispatch(linkActions.updateLinkGroup({groupId, hideTitle: !group?.hideTitle}))
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <StyledDialog>
-        {/* <h1>Group Settings</h1> */}
         <TextField
           required
           label="Title"
@@ -55,14 +50,18 @@ export const GroupSettingsModal = () => {
         <Select
           required
           label="Tile Style"
-          value={selectedLinkGroup?.tileStyle}
+          value={group?.tileStyle}
           size="small"
           fullWidth
           onChange={updateTileStyle}
         >
-          <MenuItem value={'normal'}>Normal</MenuItem>
-          <MenuItem value={'mini'}>Mini</MenuItem>
+          {TILE_STYLES.map((style: string) => (<MenuItem value={style}>{style}</MenuItem>))}
         </Select>
+        <FormControlLabel
+          control={<Checkbox checked={group?.hideTitle ?? false} onChange={checkClick} />}
+          label="Hide Title"
+        />
+        
       </StyledDialog>
     </Dialog>
   )

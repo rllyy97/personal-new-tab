@@ -5,7 +5,7 @@ import { getLinkGroups } from './app/links/selectors'
 import { actions as linkActions } from './app/links/slice'
 import Clock from './components/Clock'
 import LinkGroupTile from './components/LinkGroupTile'
-import { FlexDiv, InvisibleInput } from './GlobalComponents'
+import { FlexDiv } from './GlobalComponents'
 
 import { ContentWrapper, SiteWrapper } from './styles'
 import { LocalData } from './types'
@@ -17,6 +17,7 @@ import { NewLinkGroup } from './EmptyData'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { GroupSettingsModal } from './components/GroupSettingsModal'
+import ContextMenu from './components/ContextMenu'
 
 function App() {
 
@@ -61,11 +62,7 @@ function App() {
       <DndProvider backend={HTML5Backend}>
         <SiteWrapper backgroundColor={backgroundColor} textColor={textColor}>
           <ContentWrapper>
-            <h1 style={{opacity: '0.3', marginBottom: '16px'}}>// New Tab</h1>
-            {/* <h3>
-              Welcome&nbsp;
-              <InvisibleInput value={username} onChange={(e) => setUsername(e.target.value)}/>
-            </h3> */}
+            <h1 style={{opacity: '0.15', marginBottom: '16px'}}>// New Tab</h1>
             <Clock />
 
             {linkGroups.map((group, index) => <LinkGroupTile key={group.id} index={index} linkGroup={group} />)}
@@ -79,6 +76,8 @@ function App() {
                 Add Group
               </Button>
             </FlexDiv>
+
+            <ContextMenu />
           </ContentWrapper>
 
           <LinkSettingsModal />

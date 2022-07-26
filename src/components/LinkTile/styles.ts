@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import colors from "../../colors"
 
 export const LinkContainer = styled.div`
     position: relative;
@@ -11,26 +12,29 @@ export const LinkContainer = styled.div`
     border-radius: 12px;
     padding: 8px;
     cursor: pointer;
-    width: 112px;
-    background: #80808020;
+    min-height: 48px;
+    background: ${colors.background};
+    box-shadow: 0px 0px 0px 0px ${colors.user};
+    transition: box-shadow 0.1s ease-in-out;
 
     &:hover {
-
+        box-shadow: 0px 0px 0px 2px ${colors.user};
     }
-
 
     &.mini {
         padding: 6px;
         flex-direction: row;
-        width: 188px;
         gap: 16px;
-        padding-right: 16px;
         justify-content: flex-start;
 
         img {
             min-width: 36px;
             width: 36px;
             height: 36px;
+        }
+        
+        & > div {
+            margin-right: 8px;
         }
     }
 `
@@ -48,4 +52,17 @@ export const LinkTitle = styled.h4`
     text-overflow: ellipsis;
     max-width: 96px;
     text-transform: capitalize;
+`
+
+
+export const StatusDot = styled.div<{ fill: string, border: string }>`
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    margin: 8px;
+    margin-right: 0px !important;
+    border-radius: 50%;
+    background: ${props => props?.fill ?? 'white'};
+    border: ${props => props?.border ?? 'white'};
+    transition: all 0.5s ease-in-out;
 `

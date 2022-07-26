@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { LinkGroup } from '../../types'
 
 import LinkTile, { LinkTileProps } from '../LinkTile'
-import { EmptyGroupWarningContainer, GroupContainer, GroupTitle, LinksContainer, TitleBackground } from './styles'
+import { CircleButtonContainer, EmptyGroupWarningContainer, GroupContainer, GroupTitle, LinksContainer } from './styles'
 
 import CancelIcon from '@mui/icons-material/Cancel'
 import BuildCircleIcon from '@mui/icons-material/BuildCircle'
@@ -9,11 +10,11 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
 
 import CircleButton from '../CircleButton'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import colors from '../../colors'
 import { Button } from '@mui/material'
 import { InvisibleInput } from '../../GlobalComponents'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NewLinkData } from '../../EmptyData'
 
 import { actions as linkActions } from '../../app/links/slice'
@@ -22,8 +23,9 @@ import { actions as modalActions } from '../../app/modals/slice'
 import { getDomain } from '../../Utilities'
 import { DragSourceMonitor, DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { Identifier } from 'typescript'
-import { group } from 'console'
 import { NativeTypes } from 'react-dnd-html5-backend'
+import { AppState } from '../../app/store'
+import { HandleContext } from '../ContextMenu'
 
 
 export interface LinkGroupProps {
@@ -33,9 +35,14 @@ export interface LinkGroupProps {
 
 const LinkGroupTile = (props: LinkGroupProps) => {
     const { index, linkGroup } = props
-    const { id, title, links, minimized = false, tileStyle = 'normal' } = linkGroup
+    const { id, title, links, minimized = false, tileStyle = 'normal', hideTitle = false } = linkGroup
     
     const dispatch = useDispatch()
+
+    const group = useSelector((state: AppState) => state.links.linkGroups.find(g => g.id === id))
+    useEffect(() => {
+        setTempTitle(group?.title ?? '')
+    }, [group])
     
     const [tempTitle, setTempTitle] = useState(title)
     const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId: id, title: tempTitle}))
@@ -150,24 +157,29 @@ const LinkGroupTile = (props: LinkGroupProps) => {
             id={id}
             className={canDrop && isOver ? 'drag' : ''}
             style={rootStyle}
+            onContextMenu={(e) => HandleContext(e, dispatch, 'group', id)}
         >
-            {/* This first title is invisible, it's just to have the reactive white background */}
-            <TitleBackground>
-                {tempTitle}
-            </TitleBackground>
-            <GroupTitle style={{backgroundColor: 'transparent'}}>
+            <GroupTitle>
                 <InvisibleInput
                     value={tempTitle}
                     onBlur={updateTitle}
                     onChange={(e) => setTempTitle(e.target.value)}
-                    style={{width: ((tempTitle.length + 3) * 13) + 'px'}}
                 />
             </GroupTitle>
 
             {!minimized && (
                 links.length !== 0 ? (
                     <LinksContainer ref={linksContainerRef}>
-                        {links.filter(x => x != null).map((link, index) => <LinkTile key={link.id} groupId={id} index={index} linkData={link} tileStyle={tileStyle} />)}
+                        {links.filter(x => x != null).map((link, index) => (
+                            <LinkTile 
+                                key={link.id} 
+                                groupId={id} 
+                                index={index} 
+                                linkData={link} 
+                                tileStyle={tileStyle}
+                                hideTitle={hideTitle}
+                            />
+                        ))}
                     </LinksContainer>
                 ) : (
                     <EmptyGroupWarningContainer ref={linksContainerRef}>
@@ -182,29 +194,25 @@ const LinkGroupTile = (props: LinkGroupProps) => {
                 )
             )}
 
-            <CircleButton
-                className='tr'
-                icon={<CancelIcon style={{fill: colors.red}} />}
-                onClick={deleteGroup}
-            />
-            <CircleButton
-                className='tr'
-                style={{marginRight: '36px', transform: minimized ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'all 0.2s ease-in-out'}}
-                icon={<ExpandCircleDownIcon style={{fill: colors.blue}} />}
-                onClick={toggleMinimize}
-            />
-            <CircleButton
-                className='tr'
-                style={{marginRight: '72px'}}
-                icon={<AddCircleIcon style={{fill: colors.green}} />}
-                onClick={addLink}
-            />
-            <CircleButton
-                className='tr'
-                style={{marginRight: '108px'}}
-                icon={<BuildCircleIcon style={{fill: colors.grey}} />}
-                onClick={openGroupSettings}
-            />
+            <CircleButtonContainer>
+                {/* <CircleButton
+                    icon={<CancelIcon style={{fill: colors.red}} />}
+                    onClick={deleteGroup}
+                /> */}
+                <CircleButton
+                    icon={<AddCircleIcon style={{fill: colors.green}} />}
+                    onClick={addLink}
+                />
+                <CircleButton
+                    style={{transform: minimized ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'all 0.2s ease-in-out'}}
+                    icon={<ExpandCircleDownIcon style={{fill: colors.blue}} />}
+                    onClick={toggleMinimize}
+                />
+                {/* <CircleButton
+                    icon={<BuildCircleIcon style={{fill: colors.grey}} />}
+                    onClick={openGroupSettings}
+                /> */}
+            </CircleButtonContainer>
         </GroupContainer>
     )
 }
