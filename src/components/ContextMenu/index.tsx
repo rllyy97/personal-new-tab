@@ -4,13 +4,13 @@ import { getContextMenuPos } from "../../app/appStatus/selectors";
 import { actions } from "../../app/appStatus/slice";
 import { actions as linkActions } from "../../app/links/slice";
 import { actions as modalActions } from "../../app/modals/slice";
-import { TileType } from "../../types";
+import { ItemType } from "../../types";
 
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { AppState } from "../../app/store";
 
-export const HandleContext  = (e: React.MouseEvent, dispatch: any, type: TileType, groupId?: string, linkId?: string) => {
+export const HandleContext  = (e: React.MouseEvent, dispatch: any, type: ItemType, groupId?: string, linkId?: string) => {
   e.preventDefault();
   e.stopPropagation();
   dispatch(actions.setContextMenuPos({ x: e.clientX + 2, y: e.clientY - 6 }));
@@ -33,14 +33,14 @@ const ContextMenu = () => {
   };
 
   const handleConfigure = () => {
-    if (selectedType === 'link') dispatch(modalActions.toggleLinkSettingsModal());
-    else if (selectedType === 'group') dispatch(modalActions.toggleGroupSettingsModal());
+    if (selectedType === 'LINK') dispatch(modalActions.toggleLinkSettingsModal());
+    else if (selectedType === 'GROUP') dispatch(modalActions.toggleGroupSettingsModal());
     handleClose();
   }
 
   const handleDelete = () => {
-    if (selectedType === 'link') dispatch(linkActions.removeLinkData({groupId, linkId}))
-    if (selectedType === 'group') dispatch(linkActions.removeLinkGroup({groupId}))
+    if (selectedType === 'LINK') dispatch(linkActions.removeLinkData({groupId, linkId}))
+    if (selectedType === 'GROUP') dispatch(linkActions.removeLinkGroup({groupId}))
     handleClose();
   }
 

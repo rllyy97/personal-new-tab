@@ -10,11 +10,7 @@ export const GroupContainer = styled.div`
     padding: 28px 24px 24px;
     background: ${colors.backgroundLight};
 
-    transition: all 0.2s;
-
-    &.drag {
-        border: 2px solid ${colors.green};
-    }
+    /* transition: all 0.2s; */
 `
 
 export const GroupTitle = styled.h2`
@@ -40,7 +36,7 @@ export const EmptyGroupWarningContainer = styled.div`
     padding: 32px;
 `
 
-export const CircleButtonContainer = styled.div`
+export const ButtonContainer = styled.div`
     position: absolute;
     top: -16px;
     right: 16px;
@@ -48,5 +44,12 @@ export const CircleButtonContainer = styled.div`
     flex-direction: row;
     align-items: center;
     justify-content: center;
-
+    
+    &.buttons {
+        gap: 12px;
+        button {
+            border-radius: 100px;
+            padding-right: 12px;
+        }
+    }
 `

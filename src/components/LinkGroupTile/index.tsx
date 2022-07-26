@@ -2,17 +2,16 @@
 import { LinkGroup } from '../../types'
 
 import LinkTile, { LinkTileProps } from '../LinkTile'
-import { CircleButtonContainer, EmptyGroupWarningContainer, GroupContainer, GroupTitle, LinksContainer } from './styles'
+import { ButtonContainer, EmptyGroupWarningContainer, GroupContainer, GroupTitle, LinksContainer } from './styles'
 
-import CancelIcon from '@mui/icons-material/Cancel'
-import BuildCircleIcon from '@mui/icons-material/BuildCircle'
-import AddCircleIcon from '@mui/icons-material/AddCircle'
+import AddIcon from '@mui/icons-material/Add';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import CircleButton from '../CircleButton'
 import { useDispatch, useSelector } from 'react-redux'
 import colors from '../../colors'
-import { Button } from '@mui/material'
+import { Button, IconButton } from '@mui/material'
 import { InvisibleInput } from '../../GlobalComponents'
 import { useEffect, useRef, useState } from 'react'
 import { NewLinkData } from '../../EmptyData'
@@ -21,9 +20,9 @@ import { actions as linkActions } from '../../app/links/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 import { actions as modalActions } from '../../app/modals/slice'
 import { getDomain } from '../../Utilities'
-import { DragSourceMonitor, DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
+import { DragSourceMonitor, DropTargetMonitor, useDrag, useDrop, XYCoord } from 'react-dnd'
 import { Identifier } from 'typescript'
-import { NativeTypes } from 'react-dnd-html5-backend'
+import { getEmptyImage, NativeTypes } from 'react-dnd-html5-backend'
 import { AppState } from '../../app/store'
 import { HandleContext } from '../ContextMenu'
 
@@ -48,7 +47,6 @@ const LinkGroupTile = (props: LinkGroupProps) => {
     const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId: id, title: tempTitle}))
 
     const toggleMinimize = () => dispatch(linkActions.updateLinkGroup({groupId: id, minimized: !minimized}))
-    const deleteGroup = () => dispatch(linkActions.removeLinkGroup({groupId: id}))
     const addLink = () => {
         const newLinkData = NewLinkData()
         dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
@@ -64,11 +62,6 @@ const LinkGroupTile = (props: LinkGroupProps) => {
         newLinkData.url = newUrl
         dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
     } 
-
-    const openGroupSettings = () => {
-        dispatch(appStatusActions.setSelectedGroupId(id))
-        dispatch(modalActions.toggleGroupSettingsModal())
-    }
 
     // DND ////////////////////////////////////////////////////////////////////
 
@@ -128,23 +121,40 @@ const LinkGroupTile = (props: LinkGroupProps) => {
             const fromIndex = item.index
             const toIndex = index
             if (fromIndex === toIndex) return
+
+            // Only move when crossing the midpoint of a group
+            const hoverBoundingRect = rootRef.current?.getBoundingClientRect()
+            const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+            const clientOffset = monitor.getClientOffset()
+            const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
+            if (fromIndex < toIndex && hoverClientY < hoverMiddleY) return
+            if (fromIndex > toIndex && hoverClientY > hoverMiddleY) return
+
             dispatch(linkActions.moveLinkGroup({fromIndex, toIndex}))
             item.index = toIndex
         },
     })
 
     // Dragging Groups
-    const [{ isDragging }, dragGroup] = useDrag({
-      type: "GROUP",
-      item: () => ({ id, index }),
-      collect: (monitor: DragSourceMonitor) => ({isDragging: monitor.isDragging()}),
+    const [{ isDragging }, dragGroup, preview] = useDrag({
+        type: "GROUP",
+        item: () => ({ id, index }),
+        collect: (monitor: DragSourceMonitor) => ({isDragging: monitor.isDragging()}),
     })
+    
+    useEffect(() => {
+        preview(getEmptyImage(), { captureDraggingState: true })
+    }, [preview])
 
     dropUrl(rootRef)
     dragGroup(dropGroup(rootRef))
     dropLinks(linksContainerRef)
 
     ///
+
+    const selectIds = () => {
+        dispatch(appStatusActions.setSelectedGroupId(id))
+    }
 
     const rootStyle = {
         opacity: isDragging ? 0 : 1,
@@ -157,7 +167,8 @@ const LinkGroupTile = (props: LinkGroupProps) => {
             id={id}
             className={canDrop && isOver ? 'drag' : ''}
             style={rootStyle}
-            onContextMenu={(e) => HandleContext(e, dispatch, 'group', id)}
+            onDragStart={selectIds}
+            onContextMenu={(e) => HandleContext(e, dispatch, 'GROUP', id)}
         >
             <GroupTitle>
                 <InvisibleInput
@@ -180,6 +191,15 @@ const LinkGroupTile = (props: LinkGroupProps) => {
                                 hideTitle={hideTitle}
                             />
                         ))}
+                        {/* <Button
+                            size="small" 
+                            variant="contained"
+                            style={{color: 'black', backgroundColor: colors.green, borderRadius: '100px', marginLeft: '16px'}}
+                            onClick={addLink} 
+                            startIcon={<AddIcon />}
+                        >
+                            Add
+                        </Button> */}
                     </LinksContainer>
                 ) : (
                     <EmptyGroupWarningContainer ref={linksContainerRef}>
@@ -194,25 +214,41 @@ const LinkGroupTile = (props: LinkGroupProps) => {
                 )
             )}
 
-            <CircleButtonContainer>
-                {/* <CircleButton
-                    icon={<CancelIcon style={{fill: colors.red}} />}
-                    onClick={deleteGroup}
-                /> */}
-                <CircleButton
-                    icon={<AddCircleIcon style={{fill: colors.green}} />}
-                    onClick={addLink}
-                />
-                <CircleButton
-                    style={{transform: minimized ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'all 0.2s ease-in-out'}}
-                    icon={<ExpandCircleDownIcon style={{fill: colors.blue}} />}
+            {/* <ButtonContainer className="buttons">
+                <Button
+                    size="small" 
+                    variant="contained"
+                    style={{color: 'black', backgroundColor: colors.green}}
+                    onClick={addLink} 
+                    startIcon={<AddIcon />}
+                >
+                    Add
+                </Button>
+                <Button 
+                    size="small" 
+                    variant="contained"
+                    style={{color: 'black', backgroundColor: colors.blue}}
                     onClick={toggleMinimize}
-                />
-                {/* <CircleButton
-                    icon={<BuildCircleIcon style={{fill: colors.grey}} />}
-                    onClick={openGroupSettings}
-                /> */}
-            </CircleButtonContainer>
+                    startIcon={<ExpandMoreIcon style={{
+                        transform: minimized ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'all 0.2s ease-in-out'
+                    }} />}
+                >
+                    {!minimized ? 'Collapse' : 'Expand'}
+                </Button>
+            </ButtonContainer> */}
+
+            <ButtonContainer>
+                <IconButton size="small" onClick={addLink}>
+                    <AddCircleIcon style={{color: colors.green}} />
+                </IconButton>
+                <IconButton size="small" onClick={toggleMinimize} style={{color: colors.blue}}>
+                    <ExpandCircleDownIcon style={{
+                        transform: !minimized ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'all 0.2s ease-in-out'
+                    }} />
+                </IconButton>
+            </ButtonContainer>
         </GroupContainer>
     )
 }

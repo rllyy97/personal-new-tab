@@ -1,7 +1,7 @@
-import { TileType } from "../../types"
+import { ItemType } from "../../types"
 
 export interface AppStatusState {
-  selectedType: TileType | undefined
+  selectedType: ItemType | undefined
   selectedGroupId: string
   selectedLinkId: string
   draggedLinkId: string

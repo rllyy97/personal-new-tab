@@ -22,3 +22,9 @@ export const useSelectedLink = () => (
     state.links.linkGroups.find(g => g.id === state.appStatus.selectedGroupId)?.links.find(l => l.id === state.appStatus.selectedLinkId)
   ))
 )
+
+export const useDraggedLink = () => (
+  useSelector((state: AppState) => (
+    state.links.linkGroups.find(g => g.id === state.appStatus.selectedGroupId)?.links.find(l => l.id === state.appStatus.draggedLinkId)
+  ))
+)

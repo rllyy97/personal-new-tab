@@ -3,7 +3,7 @@ import { LinkContainer, LinkImg, LinkTitle } from './styles'
 
 import { getFavicon } from '../../Utilities'
 import { FlexDiv } from '../../GlobalComponents'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import CircleButton from '../CircleButton'
 import colors from '../../colors'
@@ -18,6 +18,7 @@ import { useDrop, useDrag, DragSourceMonitor } from 'react-dnd'
 import { Identifier } from 'typescript'
 import PingStatusDot from './pingStatusDot'
 import ContextMenu, { HandleContext } from '../ContextMenu'
+import { getEmptyImage } from 'react-dnd-html5-backend'
 
 
 export interface LinkTileProps {
@@ -68,11 +69,15 @@ const LinkTile = (props: LinkTileProps) => {
     },
   })
 
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag, preview] = useDrag({
     type: "LINK",
     item: () => ({ id, index, groupId }),
-    collect: (monitor: DragSourceMonitor) => ({isDragging: monitor.isDragging()}),
+    collect: (monitor: DragSourceMonitor) => ({isDragging: monitor.isDragging()})
   })
+
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true })
+  }, [preview])
 
   drag(drop(ref))
 
@@ -80,11 +85,16 @@ const LinkTile = (props: LinkTileProps) => {
 
   ///
 
+  const selectIds = () => {
+    dispatch(appStatusActions.setSelectedLinkId(id))
+    dispatch(appStatusActions.setSelectedGroupId(groupId))
+  }
+
   return (
     <a
       href={(url as string).startsWith('http') ? url : `http://${url}`}
-      onContextMenu={(e) => HandleContext(e, dispatch, 'link', groupId, id)}
-      style={{"opacity": "0.999"}}
+      onDragStart={selectIds}
+      onContextMenu={(e) => HandleContext(e, dispatch, 'LINK', groupId, id)}
     >
       <LinkContainer
         ref={ref}

@@ -30,5 +30,5 @@ export type LinkData = {
 export const TILE_STYLES = ['normal', 'mini']
 export type TileStyle = typeof TILE_STYLES[number];
 
-export const TILE_TYPE = ['link', 'group']
-export type TileType = typeof TILE_TYPE[number];
+export const ITEM_TYPE = ['LINK', 'GROUP']
+export type ItemType = typeof ITEM_TYPE[number];

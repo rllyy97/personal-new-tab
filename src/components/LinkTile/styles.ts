@@ -17,7 +17,7 @@ export const LinkContainer = styled.div`
     box-shadow: 0px 0px 0px 0px ${colors.user};
     transition: box-shadow 0.1s ease-in-out;
 
-    &:hover {
+    &:hover, &.hover {
         box-shadow: 0px 0px 0px 2px ${colors.user};
     }
 

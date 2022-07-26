@@ -18,6 +18,8 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { GroupSettingsModal } from './components/GroupSettingsModal'
 import ContextMenu from './components/ContextMenu'
+import colors from './colors'
+import { CustomDragLayer } from './components/CustomDragLayer/CustomDragLayer'
 
 function App() {
 
@@ -62,6 +64,7 @@ function App() {
       <DndProvider backend={HTML5Backend}>
         <SiteWrapper backgroundColor={backgroundColor} textColor={textColor}>
           <ContentWrapper>
+          <CustomDragLayer />
             <h1 style={{opacity: '0.15', marginBottom: '16px'}}>// New Tab</h1>
             <Clock />
 
@@ -72,6 +75,7 @@ function App() {
                 variant="contained"
                 onClick={() => dispatch(linkActions.addLinkGroup({linkGroup: NewLinkGroup()}))}
                 startIcon={<AddIcon />}
+                style={{color: 'black', backgroundColor: colors.blue}}
               >
                 Add Group
               </Button>
