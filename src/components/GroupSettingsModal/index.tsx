@@ -1,4 +1,4 @@
-import { Checkbox, Dialog, FormControlLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Checkbox, Dialog, FormControlLabel, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { getSelectedGroupId } from "../../app/appStatus/selectors"
@@ -32,8 +32,7 @@ export const GroupSettingsModal = () => {
   const [tempTitle, setTempTitle] = useState('')
   const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId, title: tempTitle}))
   const updateTileStyle = (e: any) => dispatch(linkActions.updateLinkGroup({groupId, tileStyle: e.target.value}))
-
-  const checkClick = () => dispatch(linkActions.updateLinkGroup({groupId, hideTitle: !group?.hideTitle}))
+  const toggleHideTitle = () => dispatch(linkActions.updateLinkGroup({groupId, hideTitle: !group?.hideTitle}))
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -54,14 +53,16 @@ export const GroupSettingsModal = () => {
           size="small"
           fullWidth
           onChange={updateTileStyle}
+          style={{ textTransform: 'capitalize' }}
         >
-          {TILE_STYLES.map((style: string) => (<MenuItem value={style}>{style}</MenuItem>))}
+          {TILE_STYLES.map((style: string) => (
+            <MenuItem value={style} style={{ textTransform: 'capitalize' }}>{style}</MenuItem>
+          ))}
         </Select>
         <FormControlLabel
-          control={<Checkbox checked={group?.hideTitle ?? false} onChange={checkClick} />}
+          control={<Checkbox checked={group?.hideTitle ?? false} onChange={toggleHideTitle} />}
           label="Hide Title"
         />
-        
       </StyledDialog>
     </Dialog>
   )

@@ -28,229 +28,195 @@ import { HandleContext } from '../ContextMenu'
 
 
 export interface LinkGroupProps {
-    index: number;
-    linkGroup: LinkGroup;
+  index: number;
+  linkGroup: LinkGroup;
 }
 
 const LinkGroupTile = (props: LinkGroupProps) => {
-    const { index, linkGroup } = props
-    const { id, title, links, minimized = false, tileStyle = 'normal', hideTitle = false } = linkGroup
+  const { index, linkGroup } = props
+  const { id, title, links, minimized = false, tileStyle = 'normal', hideTitle = false } = linkGroup
+  
+  const dispatch = useDispatch()
+
+  const group = useSelector((state: AppState) => state.links.linkGroups.find(g => g.id === id))
+  useEffect(() => {
+      setTempTitle(group?.title ?? '')
+  }, [group])
+  
+  const [tempTitle, setTempTitle] = useState(title)
+  const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId: id, title: tempTitle}))
+
+  const toggleMinimize = () => dispatch(linkActions.updateLinkGroup({groupId: id, minimized: !minimized}))
+  const addLink = () => {
+    const newLinkData = NewLinkData()
+    dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
+    dispatch(appStatusActions.setSelectedGroupId(id))
+    dispatch(appStatusActions.setSelectedLinkId(newLinkData.id))
+    dispatch(modalActions.toggleLinkSettingsModal())
+  }
+
+  const addUrl = async (url: string) => {
+    let newUrl = url.startsWith('http') ? url : `http://${url}`
+    const newLinkData = NewLinkData()
+    newLinkData.title = getDomain(newUrl)
+    newLinkData.url = newUrl
+    dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
+  } 
+
+  // DND ////////////////////////////////////////////////////////////////////
+
+  // Dropping Links
+  const linksContainerRef = useRef<HTMLDivElement>(null)
+  const [linksHandler, dropLinks] = useDrop<
+    LinkTileProps,
+    void,
+    { handlerId: Identifier | null }
+  >({
+    accept: ["LINK"],
+    collect: (monitor: any) => {
+      return { handlerId: monitor.getHandlerId() }
+    },
+    hover(item: LinkTileProps, monitor) {
+      if (!rootRef.current) return
+      const dragGroupId = item.groupId
+      const hoverGroupId = id
+      const dragIndex = item.index
+      const hoverIndex = links.length
+      if (dragGroupId === hoverGroupId) return
+      dispatch(linkActions.moveLinkData({
+        fromGroupId: dragGroupId,
+        toGroupId: hoverGroupId,
+        fromIndex: dragIndex,
+        toIndex: links.length
+      }))
+      item.index = hoverIndex
+      item.groupId = hoverGroupId
+    },
+  })
+
+  // Dropping URLs
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [{ canDrop, isOver }, dropUrl] = useDrop(() => ({
+    accept: [NativeTypes.URL],
+    drop: (item: { urls: string[] }) => {
+      console.log(item)
+      addUrl(item.urls[0])
+    },
+    collect: (monitor: DropTargetMonitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(), 
+    }),
+  }))
+
+  // Dropping Groups
+  const [groupHandler, dropGroup] = useDrop<
+    LinkTileProps,
+    void,
+    { handlerId: Identifier | null }
+  >({
+    accept: "GROUP",
+    collect: (monitor: any) => ({ handlerId: monitor.getHandlerId() }),
+    hover: (item: LinkTileProps, monitor) => {
+      if (!rootRef.current) return
+      const fromIndex = item.index
+      const toIndex = index
+      if (fromIndex === toIndex) return
+
+      // Only move when crossing the midpoint of a group
+      const hoverBoundingRect = rootRef.current?.getBoundingClientRect()
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const clientOffset = monitor.getClientOffset()
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
+      if (fromIndex < toIndex && hoverClientY < hoverMiddleY) return
+      if (fromIndex > toIndex && hoverClientY > hoverMiddleY) return
+
+      dispatch(linkActions.moveLinkGroup({fromIndex, toIndex}))
+      item.index = toIndex
+    },
+  })
+
+  // Dragging Groups
+  const [{ isDragging }, dragGroup, preview] = useDrag({
+    type: "GROUP",
+    item: () => ({ id, index }),
+    collect: (monitor: DragSourceMonitor) => ({isDragging: monitor.isDragging()}),
+  })
     
-    const dispatch = useDispatch()
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true })
+  }, [preview])
 
-    const group = useSelector((state: AppState) => state.links.linkGroups.find(g => g.id === id))
-    useEffect(() => {
-        setTempTitle(group?.title ?? '')
-    }, [group])
-    
-    const [tempTitle, setTempTitle] = useState(title)
-    const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId: id, title: tempTitle}))
+  dropUrl(rootRef)
+  dragGroup(dropGroup(rootRef))
+  dropLinks(linksContainerRef)
 
-    const toggleMinimize = () => dispatch(linkActions.updateLinkGroup({groupId: id, minimized: !minimized}))
-    const addLink = () => {
-        const newLinkData = NewLinkData()
-        dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
-        dispatch(appStatusActions.setSelectedGroupId(id))
-        dispatch(appStatusActions.setSelectedLinkId(newLinkData.id))
-        dispatch(modalActions.toggleLinkSettingsModal())
-    }
+  ///
 
-    const addUrl = async (url: string) => {
-        let newUrl = url.startsWith('http') ? url : `http://${url}`
-        const newLinkData = NewLinkData()
-        newLinkData.title = getDomain(newUrl)
-        newLinkData.url = newUrl
-        dispatch(linkActions.addLinkData({groupId: id, linkData: newLinkData}))
-    } 
+  const selectIds = () => {
+    dispatch(appStatusActions.setSelectedGroupId(id))
+  }
 
-    // DND ////////////////////////////////////////////////////////////////////
+  const rootStyle = {
+    opacity: isDragging ? 0 : 1,
+    padding: minimized ? '16px' : '',
+  }
 
-    // Dropping Links
-    const linksContainerRef = useRef<HTMLDivElement>(null)
-    const [linksHandler, dropLinks] = useDrop<
-      LinkTileProps,
-      void,
-      { handlerId: Identifier | null }
-    >({
-      accept: ["LINK"],
-      collect: (monitor: any) => {
-        return { handlerId: monitor.getHandlerId() }
-      },
-      hover(item: LinkTileProps, monitor) {
-        if (!rootRef.current) return
-        const dragGroupId = item.groupId
-        const hoverGroupId = id
-        const dragIndex = item.index
-        const hoverIndex = links.length
-        if (dragGroupId === hoverGroupId) return
-        dispatch(linkActions.moveLinkData({
-          fromGroupId: dragGroupId,
-          toGroupId: hoverGroupId,
-          fromIndex: dragIndex,
-          toIndex: links.length
-        }))
-        item.index = hoverIndex
-        item.groupId = hoverGroupId
-      },
-    })
+  return (
+    <GroupContainer
+      ref={rootRef}
+      id={id}
+      className={canDrop && isOver ? 'drag' : ''}
+      style={rootStyle}
+      onDragStart={selectIds}
+      onContextMenu={(e) => HandleContext(e, dispatch, 'GROUP', id)}
+    >
+      <GroupTitle>
+        <InvisibleInput
+          value={tempTitle}
+          onBlur={updateTitle}
+          onChange={(e) => setTempTitle(e.target.value)}
+        />
+      </GroupTitle>
 
-    // Dropping URLs
-    const rootRef = useRef<HTMLDivElement>(null)
-    const [{ canDrop, isOver }, dropUrl] = useDrop(() => ({
-      accept: [NativeTypes.URL],
-      drop: (item: { urls: string[] }) => {
-        console.log(item)
-        addUrl(item.urls[0])
-      },
-      collect: (monitor: DropTargetMonitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(), 
-      }),
-    }))
-
-    // Dropping Groups
-    const [groupHandler, dropGroup] = useDrop<
-      LinkTileProps,
-      void,
-      { handlerId: Identifier | null }
-    >({
-        accept: "GROUP",
-        collect: (monitor: any) => ({ handlerId: monitor.getHandlerId() }),
-        hover: (item: LinkTileProps, monitor) => {
-            if (!rootRef.current) return
-            const fromIndex = item.index
-            const toIndex = index
-            if (fromIndex === toIndex) return
-
-            // Only move when crossing the midpoint of a group
-            const hoverBoundingRect = rootRef.current?.getBoundingClientRect()
-            const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
-            const clientOffset = monitor.getClientOffset()
-            const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
-            if (fromIndex < toIndex && hoverClientY < hoverMiddleY) return
-            if (fromIndex > toIndex && hoverClientY > hoverMiddleY) return
-
-            dispatch(linkActions.moveLinkGroup({fromIndex, toIndex}))
-            item.index = toIndex
-        },
-    })
-
-    // Dragging Groups
-    const [{ isDragging }, dragGroup, preview] = useDrag({
-        type: "GROUP",
-        item: () => ({ id, index }),
-        collect: (monitor: DragSourceMonitor) => ({isDragging: monitor.isDragging()}),
-    })
-    
-    useEffect(() => {
-        preview(getEmptyImage(), { captureDraggingState: true })
-    }, [preview])
-
-    dropUrl(rootRef)
-    dragGroup(dropGroup(rootRef))
-    dropLinks(linksContainerRef)
-
-    ///
-
-    const selectIds = () => {
-        dispatch(appStatusActions.setSelectedGroupId(id))
-    }
-
-    const rootStyle = {
-        opacity: isDragging ? 0 : 1,
-        padding: minimized ? '16px' : '',
-    }
-
-    return (
-        <GroupContainer
-            ref={rootRef}
-            id={id}
-            className={canDrop && isOver ? 'drag' : ''}
-            style={rootStyle}
-            onDragStart={selectIds}
-            onContextMenu={(e) => HandleContext(e, dispatch, 'GROUP', id)}
-        >
-            <GroupTitle>
-                <InvisibleInput
-                    value={tempTitle}
-                    onBlur={updateTitle}
-                    onChange={(e) => setTempTitle(e.target.value)}
-                />
-            </GroupTitle>
-
-            {!minimized && (
-                links.length !== 0 ? (
-                    <LinksContainer ref={linksContainerRef}>
-                        {links.filter(x => x != null).map((link, index) => (
-                            <LinkTile 
-                                key={link.id} 
-                                groupId={id} 
-                                index={index} 
-                                linkData={link} 
-                                tileStyle={tileStyle}
-                                hideTitle={hideTitle}
-                            />
-                        ))}
-                        {/* <Button
-                            size="small" 
-                            variant="contained"
-                            style={{color: 'black', backgroundColor: colors.green, borderRadius: '100px', marginLeft: '16px'}}
-                            onClick={addLink} 
-                            startIcon={<AddIcon />}
-                        >
-                            Add
-                        </Button> */}
-                    </LinksContainer>
-                ) : (
-                    <EmptyGroupWarningContainer ref={linksContainerRef}>
-                        <Button
-                        startIcon={<AddCircleIcon />}
-                        onClick={addLink}
-                        color="success"
-                        >
-                            Add Link
-                        </Button>
-                    </EmptyGroupWarningContainer>
-                )
-            )}
-
-            {/* <ButtonContainer className="buttons">
-                <Button
-                    size="small" 
-                    variant="contained"
-                    style={{color: 'black', backgroundColor: colors.green}}
-                    onClick={addLink} 
-                    startIcon={<AddIcon />}
-                >
-                    Add
-                </Button>
-                <Button 
-                    size="small" 
-                    variant="contained"
-                    style={{color: 'black', backgroundColor: colors.blue}}
-                    onClick={toggleMinimize}
-                    startIcon={<ExpandMoreIcon style={{
-                        transform: minimized ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'all 0.2s ease-in-out'
-                    }} />}
-                >
-                    {!minimized ? 'Collapse' : 'Expand'}
-                </Button>
-            </ButtonContainer> */}
-
-            <ButtonContainer>
-                <IconButton size="small" onClick={addLink}>
-                    <AddCircleIcon style={{color: colors.green}} />
-                </IconButton>
-                <IconButton size="small" onClick={toggleMinimize} style={{color: colors.blue}}>
-                    <ExpandCircleDownIcon style={{
-                        transform: !minimized ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'all 0.2s ease-in-out'
-                    }} />
-                </IconButton>
-            </ButtonContainer>
-        </GroupContainer>
-    )
+      {!minimized && (
+        links.length !== 0 ? (
+          <LinksContainer ref={linksContainerRef}>
+            {links.filter(x => x != null).map((link, index) => (
+              <LinkTile 
+                key={link.id} 
+                groupId={id} 
+                index={index} 
+                linkData={link} 
+                tileStyle={tileStyle}
+                hideTitle={hideTitle}
+              />
+            ))}
+          </LinksContainer>
+        ) : (
+          <EmptyGroupWarningContainer ref={linksContainerRef}>
+            <Button
+              startIcon={<AddCircleIcon />}
+              onClick={addLink}
+              color="success"
+            >
+              Add Link
+            </Button>
+          </EmptyGroupWarningContainer>
+        )
+      )}
+      <ButtonContainer>
+        <IconButton size="small" onClick={addLink}>
+          <AddCircleIcon style={{color: colors.green}} />
+        </IconButton>
+        <IconButton size="small" onClick={toggleMinimize} style={{color: colors.blue}}>
+          <ExpandCircleDownIcon style={{
+            transform: !minimized ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'all 0.2s ease-in-out'
+          }} />
+        </IconButton>
+      </ButtonContainer>
+    </GroupContainer>
+  )
 }
 
 export default LinkGroupTile

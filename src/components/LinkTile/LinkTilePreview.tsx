@@ -13,7 +13,7 @@ const LinkTilePreview = (props: any) => {
 
   const group = useSelectedGroup()
   if (!link) return null;
-  const { id, title, url, imageUrl, visitCount } = link;
+  const { id, title, url, imageUrl } = link;
 
   const isLocalPort = link?.url.includes('localhost:')
   const tileStyle = group?.tileStyle

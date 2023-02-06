@@ -45,7 +45,6 @@ export const LinkSettingsModal = () => {
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <StyledDialog>
-        {/* <h1>Link Settings</h1> */}
         <LinkImg
           alt=''
           style={{marginBottom: '12px'}}

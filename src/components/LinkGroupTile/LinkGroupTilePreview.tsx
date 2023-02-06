@@ -23,37 +23,37 @@ const LinkGroupTilePreview = () => {
 
   return (
     <GroupContainer style={rootStyle}>
-        <GroupTitle>
-          <InvisibleInput value={title} />
-        </GroupTitle>
+      <GroupTitle>
+        <InvisibleInput value={title} />
+      </GroupTitle>
 
-        {!minimized && (
-          links.length !== 0 ? (
-            <LinksContainer>
-              {links.filter(x => x != null).map((link, index) => (
-                <LinkTilePreview link={link} />
-              ))} 
-            </LinksContainer>
-          ) : (
-            <EmptyGroupWarningContainer>
-              <Button startIcon={<AddCircleIcon />} color="success">
-                Add Link
-              </Button>
-            </EmptyGroupWarningContainer>
-          )
-        )}
+      {!minimized && (
+        links.length !== 0 ? (
+          <LinksContainer>
+            {links.filter(x => x != null).map((link, index) => (
+              <LinkTilePreview link={link} />
+            ))} 
+          </LinksContainer>
+        ) : (
+          <EmptyGroupWarningContainer>
+            <Button startIcon={<AddCircleIcon />} color="success">
+              Add Link
+            </Button>
+          </EmptyGroupWarningContainer>
+        )
+      )}
 
-        <ButtonContainer>
-            <IconButton size="small">
-                <AddCircleIcon style={{color: colors.green}} />
-            </IconButton>
-            <IconButton size="small" style={{color: colors.blue}}>
-                <ExpandCircleDownIcon style={{
-                    transform: !minimized ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'all 0.2s ease-in-out'
-                }} />
-            </IconButton>
-        </ButtonContainer>
+      <ButtonContainer>
+        <IconButton size="small">
+          <AddCircleIcon style={{color: colors.green}} />
+        </IconButton>
+        <IconButton size="small" style={{color: colors.blue}}>
+          <ExpandCircleDownIcon style={{
+              transform: !minimized ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'all 0.2s ease-in-out'
+          }} />
+        </IconButton>
+      </ButtonContainer>
     </GroupContainer>
   )
 }
