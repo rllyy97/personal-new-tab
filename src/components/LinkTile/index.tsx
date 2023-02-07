@@ -5,19 +5,14 @@ import { getFavicon } from '../../Utilities'
 import { FlexDiv } from '../../GlobalComponents'
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import CircleButton from '../CircleButton'
-import colors from '../../colors'
 
 import { actions as linkActions } from '../../app/links/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
-import { actions as modalActions } from '../../app/modals/slice'
 
-import CancelIcon from '@mui/icons-material/Cancel'
-import BuildCircleIcon from '@mui/icons-material/BuildCircle'
 import { useDrop, useDrag, DragSourceMonitor } from 'react-dnd'
 import { Identifier } from 'typescript'
 import PingStatusDot from './pingStatusDot'
-import ContextMenu, { HandleContext } from '../ContextMenu'
+import { HandleContext } from '../ContextMenu'
 import { getEmptyImage } from 'react-dnd-html5-backend'
 
 
@@ -42,7 +37,7 @@ const LinkTile = (props: LinkTileProps) => {
   ///
 
   const ref = useRef<HTMLDivElement>(null)
-  const [{ handlerId }, drop] = useDrop<
+  const [, drop] = useDrop<
     LinkTileProps,
     void,
     { handlerId: Identifier | null }
@@ -104,16 +99,16 @@ const LinkTile = (props: LinkTileProps) => {
         onMouseLeave={() => setHasHover(false)}
         style={{opacity: isDragging ? 0 : 0.999}}
       >
-          {!isLocalPort ? (
-            <LinkImg alt='' src={imageUrl !== '' ? imageUrl : fallback} />
-          ) : (
-            <PingStatusDot url={url} />
-          )}
-          {!hideTitle && (
-            <FlexDiv style={{maxWidth: '96px'}}>
-              <LinkTitle>{title}</LinkTitle>
-            </FlexDiv>
-          )}
+        {!isLocalPort ? (
+          <LinkImg alt='' src={imageUrl !== '' ? imageUrl : fallback} />
+        ) : (
+          <PingStatusDot url={url} />
+        )}
+        {!hideTitle && (
+          <FlexDiv style={{maxWidth: '96px'}}>
+            <LinkTitle>{title}</LinkTitle>
+          </FlexDiv>
+        )}
       </LinkContainer>
     </a>
   )

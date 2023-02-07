@@ -7,7 +7,7 @@ const colors = {
   blue: '#1e88e5',
   grey: '#cccccc4d',
 
-  user: '#1e88e5',
+  darkGreen: '#28925A',
 }
 
 export default colors

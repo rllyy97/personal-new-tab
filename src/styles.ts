@@ -1,3 +1,4 @@
+import { Chip } from "@mui/material"
 import styled from "styled-components"
 
 export const SiteWrapper = styled.div<{backgroundColor: string, textColor: string}>`
@@ -19,4 +20,10 @@ export const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
+`
+
+export const ChipIconButton = styled(Chip)`
+  .MuiChip-icon {
+    margin-left: 16px !important;
+  }
 `

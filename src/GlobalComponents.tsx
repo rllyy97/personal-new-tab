@@ -25,10 +25,24 @@ export const InvisibleInput = styled.input`
 `
 
 export const StyledDialog = styled.div`
-  padding: 24px;
+  min-width: 420px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 16px;
 `
+
+export const ButtonRow = styled.div`
+  /* width: 100%; */
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+
+  /* button {
+    flex: 1;
+  } */
+`
+

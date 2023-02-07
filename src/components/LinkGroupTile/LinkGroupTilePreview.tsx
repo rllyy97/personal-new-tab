@@ -17,7 +17,7 @@ const LinkGroupTilePreview = () => {
 
   const rootStyle = {
     padding: minimized ? '16px' : '',
-    boxShadow: `0px 0px 0px 2px ${colors.user}`,
+    boxShadow: `0px 0px 0px 2px ${colors.blue}`,
     // display: 'flex',
   }
 

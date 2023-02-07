@@ -18,8 +18,8 @@ export const LinkSettingsModal = () => {
   
   const isOpen = useSelector(isLinkSettingsOpen)
   const handleClose = () => {
-    dispatch(appStatusActions.clearSelectedIds())
     dispatch(modalActions.toggleLinkSettingsModal())
+    setTimeout(() => dispatch(appStatusActions.clearSelectedIds()), 200)
   }
 
   const groupId = useSelector(getSelectedGroupId)
@@ -52,6 +52,7 @@ export const LinkSettingsModal = () => {
         />
         <TextField
           required
+          fullWidth
           label="Title"
           value={tempTitle}
           size="small"
@@ -61,6 +62,7 @@ export const LinkSettingsModal = () => {
         />
         <TextField
           required
+          fullWidth
           label="Url"
           value={tempUrl} 
           size="small"
@@ -69,6 +71,7 @@ export const LinkSettingsModal = () => {
           onChange={(e) => setTempUrl(e.target.value)}
         />
         <TextField
+          fullWidth
           label="Custom Image URL"
           value={tempImageUrl}
           size="small"

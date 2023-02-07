@@ -1,6 +1,7 @@
-import { Checkbox, Dialog, FormControlLabel, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { Checkbox, Dialog, FormControlLabel, MenuItem, Select, TextField } from "@mui/material"
+import FolderIcon from '@mui/icons-material/Folder';
 import { getSelectedGroupId } from "../../app/appStatus/selectors"
 import { isGroupSettingsOpen } from "../../app/modals/selectors"
 import { TILE_STYLES } from "../../types"
@@ -18,8 +19,8 @@ export const GroupSettingsModal = () => {
   
   const isOpen = useSelector(isGroupSettingsOpen)
   const handleClose = () => {
-    dispatch(appStatusActions.clearSelectedIds())
     dispatch(modalActions.toggleGroupSettingsModal())
+    setTimeout(() => dispatch(appStatusActions.clearSelectedIds()), 200)
   }
 
   const groupId = useSelector(getSelectedGroupId)
@@ -37,8 +38,10 @@ export const GroupSettingsModal = () => {
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <StyledDialog>
+        <FolderIcon style={{marginBottom: '12px', width: '96px', height: '96px' }} />
         <TextField
           required
+          fullWidth
           label="Title"
           value={tempTitle}
           size="small"

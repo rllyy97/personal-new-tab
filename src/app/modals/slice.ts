@@ -6,6 +6,8 @@ const initialState: ModalsState = {
   appSettingsOpen: false,
   groupSettingsOpen: false,
   linkSettingsOpen: false,
+  authOpen: false,
+  profileOpen: false,
 }
 
 const modalsSlice = createSlice({
@@ -15,7 +17,16 @@ const modalsSlice = createSlice({
     toggleAppSettingsModal(state) { state.appSettingsOpen = !state.appSettingsOpen },
     toggleGroupSettingsModal(state) { state.groupSettingsOpen = !state.groupSettingsOpen },
     toggleLinkSettingsModal(state) { state.linkSettingsOpen = !state.linkSettingsOpen },
+    toggleAuthModal(state) { state.authOpen = !state.authOpen },
+    toggleProfileModal(state) { state.profileOpen = !state.profileOpen },
   }
 })
 
 export const { name, actions, reducer } = modalsSlice
+export const { 
+  toggleAppSettingsModal,
+  toggleGroupSettingsModal,
+  toggleLinkSettingsModal,
+  toggleAuthModal,
+  toggleProfileModal,
+} = modalsSlice.actions

@@ -5,7 +5,7 @@ export const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: colors.blue,
+      main: colors.darkGreen,
     },
     secondary: {
       main: colors.red,

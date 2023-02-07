@@ -1,4 +1,4 @@
-import { Button, CssBaseline, ThemeProvider, useTheme } from '@mui/material'
+import { Button, Chip, CssBaseline, ThemeProvider } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getLinkGroups } from './app/links/selectors'
@@ -7,7 +7,7 @@ import Clock from './components/Clock'
 import LinkGroupTile from './components/LinkGroupTile'
 import { FlexDiv } from './GlobalComponents'
 
-import { ContentWrapper, SiteWrapper } from './styles'
+import { ChipIconButton, ContentWrapper, SiteWrapper } from './styles'
 import { LocalData } from './types'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -20,10 +20,19 @@ import { GroupSettingsModal } from './components/GroupSettingsModal'
 import ContextMenu from './components/ContextMenu'
 import colors from './colors'
 import { CustomDragLayer } from './components/CustomDragLayer/CustomDragLayer'
+import { AuthModal } from './components/AuthModal'
+import { toggleAuthModal, toggleProfileModal } from './app/modals/slice'
+import { useAuthSession, useAuthUser } from './app/auth/selectors'
+import { VpnKey } from '@mui/icons-material'
+import { ProfileModal } from './components/ProfileModal'
+
 
 function App() {
 
   const dispatch = useDispatch()
+
+  const authSession = useAuthSession()
+  const authUser = useAuthUser()
 
   const [username, setUsername] = useState('User')
   const [notes, setNotes] = useState<string[]>([])
@@ -66,6 +75,16 @@ function App() {
           <ContentWrapper>
           <CustomDragLayer />
             <h1 style={{opacity: '0.15', marginBottom: '16px'}}>// New Tab</h1>
+            <ChipIconButton 
+              icon={<VpnKey />} 
+              onClick={() => dispatch(authSession ? toggleProfileModal() : toggleAuthModal())} 
+              style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                ...(authSession ? {backgroundColor: colors.darkGreen} : {}),
+              }}
+            />
             <Clock />
 
             {linkGroups.map((group, index) => <LinkGroupTile key={group.id} index={index} linkGroup={group} />)}
@@ -74,8 +93,9 @@ function App() {
               <Button 
                 variant="contained"
                 onClick={() => dispatch(linkActions.addLinkGroup({linkGroup: NewLinkGroup()}))}
+                color="primary"
                 startIcon={<AddIcon />}
-                style={{color: 'black', backgroundColor: colors.blue}}
+                // style={{color: 'black'}}
               >
                 Add Group
               </Button>
@@ -83,9 +103,12 @@ function App() {
 
             <ContextMenu />
           </ContentWrapper>
-          
+          {/* Modals */}
           <LinkSettingsModal />
           <GroupSettingsModal />
+          <AuthModal />
+          <ProfileModal />
+          {/*  */}
         </SiteWrapper>
       </DndProvider>
     </ThemeProvider>

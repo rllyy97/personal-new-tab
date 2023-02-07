@@ -41,3 +41,7 @@ a {
 .button:hover {
   background: #cccccc33;
 }
+
+.MuiButton-root {
+  border-radius: 24px !important;
+}
