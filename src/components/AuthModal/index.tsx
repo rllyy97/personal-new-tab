@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Alert, Button, Dialog, FormControl, IconButton, InputAdornment, InputLabel, Typography } from "@mui/material"
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
@@ -29,11 +29,21 @@ export const AuthModal = () => {
     dispatch(modalActions.toggleAuthModal())
   }
 
+  useEffect(() => {
+    Supabase.auth.refreshSession().then(({ data }) => {
+      if (data) handleSuccess(data)
+    })
+  }, [])
+
   const handleSuccess = ({user, session}: {user: User | null, session: Session | null}) => {
+    if (!user || !session) return
     dispatch(setSession(session))
     dispatch(setUser(user))
     setErrorValue('')
     setSuccessValue('Success!')
+  }
+
+  const delayedClose = () => {
     setTimeout(() => handleClose(), 1000)
     setTimeout(() => clearState(), 1200)
   }
@@ -65,7 +75,10 @@ export const AuthModal = () => {
     setIsLoading(false)
     console.log("loginResponse", loginResponse)
     if (loginResponse.error) setErrorValue(loginResponse.error.message)
-    else if (loginResponse.data) handleSuccess(loginResponse.data)
+    else if (loginResponse.data) {
+      handleSuccess(loginResponse.data)
+      delayedClose()
+    }
   }
 
   // Try to sign up with supabase
@@ -79,7 +92,10 @@ export const AuthModal = () => {
     setIsLoading(false)
     console.log("signupResponse", signupResponse)
     if (signupResponse.error) setErrorValue(signupResponse.error.message)
-    else if (signupResponse.data) handleSuccess(signupResponse.data)
+    else if (signupResponse.data) {
+      handleSuccess(signupResponse.data)
+      delayedClose()
+    }
   }
 
   return (

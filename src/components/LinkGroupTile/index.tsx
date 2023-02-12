@@ -157,18 +157,28 @@ const LinkGroupTile = (props: LinkGroupProps) => {
   }
 
   const rootStyle = {
-    opacity: isDragging ? 0 : 1,
+    ...(isDragging ? {opacity: 0} : {}),
     padding: minimized ? '16px' : '',
   }
+
+  const [isFirstLoad, setIsFirstLoad] = useState(true)
+  useEffect(() => {
+    // wait for the first load animation to finish
+    setTimeout(() => setIsFirstLoad(false), 200*(index+1))
+  }, [])
 
   return (
     <GroupContainer
       ref={rootRef}
       id={id}
-      className={canDrop && isOver ? 'drag' : ''}
+      className={`
+        ${canDrop && isOver ? 'drag' : ''}
+        ${isFirstLoad && 'first-load'}
+      `}
       style={rootStyle}
       onDragStart={selectIds}
       onContextMenu={(e) => HandleContext(e, dispatch, 'GROUP', id)}
+      index={index}
     >
       <GroupTitle>
         <InvisibleInput

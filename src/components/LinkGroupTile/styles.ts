@@ -1,7 +1,20 @@
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
 import colors from "../../colors"
 
-export const GroupContainer = styled.div`
+const loadAnimation = keyframes`
+  0% {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(-24px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+`
+
+export const GroupContainer = styled.div<{ index?: number }>`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -10,7 +23,12 @@ export const GroupContainer = styled.div`
   padding: 28px 24px 24px;
   background: ${colors.backgroundLight};
 
-  /* transition: all 0.2s; */
+  &.first-load {
+    opacity: 0;
+    animation: ${loadAnimation} 0.2s ease-in-out;
+    animation-delay: ${({ index }) => index ? index * 0.05 : 0}s;
+    animation-fill-mode: forwards;
+  }
 `
 
 export const GroupTitle = styled.h2`
