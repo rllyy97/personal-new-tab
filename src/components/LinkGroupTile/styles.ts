@@ -1,5 +1,6 @@
 import styled, { keyframes } from "styled-components"
 import colors from "../../colors"
+import { tileDetailing } from "../../styles"
 
 const loadAnimation = keyframes`
   0% {
@@ -22,11 +23,12 @@ export const GroupContainer = styled.div<{ index?: number }>`
   border-radius: 12px;
   padding: 28px 24px 24px;
   background: ${colors.backgroundLight};
+  ${tileDetailing}
 
   &.first-load {
     opacity: 0;
     animation: ${loadAnimation} 0.2s ease-in-out;
-    animation-delay: ${({ index }) => index ? index * 0.05 : 0}s;
+    animation-delay: ${({ index }) => index ? index * 0.04 : 0}s;
     animation-fill-mode: forwards;
   }
 `

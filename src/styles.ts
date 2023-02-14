@@ -1,5 +1,5 @@
 import { Chip } from "@mui/material"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 export const SiteWrapper = styled.div<{backgroundColor: string, textColor: string}>`
   position: relative;
@@ -26,4 +26,11 @@ export const ChipIconButton = styled(Chip)`
   .MuiChip-icon {
     margin-left: 16px !important;
   }
+`
+
+export const tileDetailing = css`
+  box-shadow: 
+    0px 0px 1px black,
+    0px 1px 1px 0px #80808030 inset,
+    0px -1px 1px 0px #00000040 inset;
 `

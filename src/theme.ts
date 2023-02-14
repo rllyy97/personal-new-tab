@@ -5,13 +5,19 @@ export const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: colors.darkGreen,
+      main: colors.green,
     },
     secondary: {
-      main: colors.red,
+      main: colors.blue,
     },
     success: {
       main: colors.green,
+    },
+    info: {
+      main: colors.darkBlue,
+    },
+    error: {
+      main: colors.red
     }
   },
 })

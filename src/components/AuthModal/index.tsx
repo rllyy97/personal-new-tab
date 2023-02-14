@@ -27,6 +27,7 @@ export const AuthModal = () => {
   const handleClose = () => {
     setErrorValue('')
     dispatch(modalActions.toggleAuthModal())
+    setTimeout(() => clearState(), 200)
   }
 
   useEffect(() => {
@@ -34,6 +35,10 @@ export const AuthModal = () => {
       if (data) handleSuccess(data)
     })
   }, [])
+
+  useEffect(() => {
+    if (isOpen) clearState()
+  }, [isOpen])
 
   const handleSuccess = ({user, session}: {user: User | null, session: Session | null}) => {
     if (!user || !session) return
@@ -44,8 +49,7 @@ export const AuthModal = () => {
   }
 
   const delayedClose = () => {
-    setTimeout(() => handleClose(), 1000)
-    setTimeout(() => clearState(), 1200)
+    setTimeout(() => handleClose(), 600)
   }
 
   const clearState = () => {
@@ -101,10 +105,10 @@ export const AuthModal = () => {
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <StyledDialog>
-        <div style={{margin: '16px 0px'}}>
+        <div style={{margin: '16px 0px', width: '100%'}}>
           <VpnKeyIcon style={{fontSize: '48px'}}/>
           <Typography style={{fontWeight: 'bold'}}>
-            Login or signup to save your data more securely
+            Login or signup
           </Typography>
         </div>
         <FormControl fullWidth required>

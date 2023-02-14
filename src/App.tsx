@@ -24,10 +24,10 @@ import { AuthModal } from './components/AuthModal'
 import { toggleAuthModal, toggleProfileModal } from './app/modals/slice'
 import { useAuthSession, useAuthUser } from './app/auth/selectors'
 import { VpnKey } from '@mui/icons-material'
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { ProfileModal } from './components/ProfileModal'
 import { Supabase } from './supabaseClient'
 import useDebouncedEffect from './hooks/useDebouncedEffect'
-
 
 function App() {
 
@@ -38,7 +38,6 @@ function App() {
   const [isAuthLoading, setIsAuthLoading] = useState(false)
 
   const [username, setUsername] = useState('User')
-  const [notes, setNotes] = useState<string[]>([])
   const [backgroundColor, setBackgroundColor] = useState(colors.background)
   const [textColor, setTextColor] = useState('#ffffff')
 
@@ -61,7 +60,6 @@ function App() {
 
   const initData = useCallback((data: RootData) => {
     setUsername(data.username)
-    setNotes(data.notes)
     setBackgroundColor(data.backgroundColor)
     dispatch(linkActions.setLinkGroups(data.linkGroups))
   }, [dispatch])
@@ -100,7 +98,6 @@ function App() {
     
     let serializedData = { 
       username, 
-      notes, 
       backgroundColor, 
       linkGroups: cleanedLinkGroups,
     }
@@ -115,7 +112,7 @@ function App() {
 
       if (error) openAlert(error.message, 'error')
     }
-  }, [authSession, authUser, backgroundColor, linkGroups, notes, username])
+  }, [authSession, authUser, backgroundColor, linkGroups, username])
   useDebouncedEffect(saveData, 1000, [saveData])
 
 
@@ -130,17 +127,30 @@ function App() {
           <ContentWrapper>
           <CustomDragLayer />
             <h1 style={{opacity: '0.15', marginBottom: '16px'}}>{"// New Tab"}</h1>
-            <ChipIconButton 
-              icon={<VpnKey />} 
-              onClick={() => dispatch(authSession ? toggleProfileModal() : toggleAuthModal())} 
+            <div 
               style={{
                 position: 'absolute',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                transition: 'background-color 0.2s',
-                ...(authSession ? {backgroundColor: colors.darkGreen} : {}),
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '16px',
               }}
-            />
+            >
+              <a href={"https://github.com/rllyy97/personal-new-tab"} target="_blank" rel="noopener noreferrer">
+                <ChipIconButton
+                  icon={<GitHubIcon />}
+                  color={'default'}
+                  onClick={() => {}}
+                />
+              </a>
+              <ChipIconButton
+                icon={<VpnKey />} 
+                color={authSession ? 'primary' : 'default'}
+                onClick={() => dispatch(authSession ? toggleProfileModal() : toggleAuthModal())}
+              />
+            </div>
             <Clock />
 
             {isAuthLoading ? 
@@ -150,7 +160,7 @@ function App() {
                 {linkGroups.map((group, index) => <LinkGroupTile key={group.id} index={index} linkGroup={group} />)}
 
                 <FlexDiv>
-                  <Button 
+                  <Button
                     variant="contained"
                     onClick={() => dispatch(linkActions.addLinkGroup({linkGroup: NewLinkGroup()}))}
                     color="primary"

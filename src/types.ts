@@ -1,7 +1,6 @@
 
 export type RootData = {
   username: string,
-  notes: string[],
   backgroundColor: string,
   linkGroups: LinkGroup[],
   lastUpdated: number,

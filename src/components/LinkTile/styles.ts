@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import colors from "../../colors"
+import { tileDetailing } from "../../styles"
 
 export const LinkContainer = styled.div`
   position: relative;
@@ -16,6 +17,8 @@ export const LinkContainer = styled.div`
   background: ${colors.background};
   box-shadow: 0px 0px 0px 0px ${colors.blue};
   transition: box-shadow 0.1s ease-in-out;
+
+  ${tileDetailing}
 
   &:hover, &.hover {
     box-shadow: 0px 0px 0px 2px ${colors.blue};
