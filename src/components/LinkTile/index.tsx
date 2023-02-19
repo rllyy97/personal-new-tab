@@ -6,7 +6,7 @@ import { FlexDiv } from '../../GlobalComponents'
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { actions as linkActions } from '../../app/links/slice'
+import { actions as linkActions } from '../../app/data/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 
 import { useDrop, useDrag, DragSourceMonitor } from 'react-dnd'

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { getSelectedGroupId, getSelectedLinkId, useSelectedLink } from "../../app/appStatus/selectors"
 import { isLinkSettingsOpen } from "../../app/modals/selectors"
 
-import { actions as linkActions } from '../../app/links/slice'
+import { actions as linkActions } from '../../app/data/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 import { actions as modalActions } from '../../app/modals/slice'
 

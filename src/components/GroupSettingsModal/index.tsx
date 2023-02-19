@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Checkbox, Dialog, FormControlLabel, MenuItem, Select, TextField } from "@mui/material"
 import FolderIcon from '@mui/icons-material/Folder';
-import { getSelectedGroupId } from "../../app/appStatus/selectors"
+import { useSelectedGroup } from "../../app/appStatus/selectors"
 import { isGroupSettingsOpen } from "../../app/modals/selectors"
 import { TILE_STYLES } from "../../types"
 
-import { actions as linkActions } from '../../app/links/slice'
+import { actions as linkActions } from '../../app/data/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 import { actions as modalActions } from '../../app/modals/slice'
 
 import { StyledDialog } from "../../GlobalComponents"
-import { AppState } from "../../app/store"
 
 export const GroupSettingsModal = () => {
 
@@ -23,8 +22,8 @@ export const GroupSettingsModal = () => {
     setTimeout(() => dispatch(appStatusActions.clearSelectedIds()), 200)
   }
 
-  const groupId = useSelector(getSelectedGroupId)
-  const group = useSelector((state: AppState) => state.links.linkGroups.find(g => g.id === groupId))
+  const group = useSelectedGroup()
+  const groupId = useMemo(() => group?.id, [group])
 
   useEffect(() => {
     setTempTitle(group?.title ?? '')

@@ -2,7 +2,7 @@ import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux";
 import { getContextMenuPos } from "../../app/appStatus/selectors";
 import { actions } from "../../app/appStatus/slice";
-import { actions as linkActions } from "../../app/links/slice";
+import { actions as linkActions } from "../../app/data/slice";
 import { actions as modalActions } from "../../app/modals/slice";
 import { ItemType } from "../../types";
 

@@ -1,8 +1,8 @@
 import { Alert, Button, CircularProgress, CssBaseline, Snackbar, ThemeProvider } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getLinkGroups } from './app/links/selectors'
-import { actions as linkActions } from './app/links/slice'
+import { useDispatch } from 'react-redux'
+import { useBoards, useLinkGroups } from './app/data/selectors'
+import { actions as linkActions } from './app/data/slice'
 import Clock from './components/Clock'
 import LinkGroupTile from './components/LinkGroupTile'
 import { FlexDiv } from './GlobalComponents'
@@ -38,10 +38,11 @@ function App() {
   const [isAuthLoading, setIsAuthLoading] = useState(false)
 
   const [username, setUsername] = useState('User')
-  const [backgroundColor, setBackgroundColor] = useState(colors.background)
-  const [textColor, setTextColor] = useState('#ffffff')
 
-  const linkGroups = useSelector(getLinkGroups)
+  const linkGroups = useLinkGroups()
+  const boards = useBoards()
+  // const selectedBoardId = useSelectedBoardId()
+  // const selectedBoard = useMemo(() => boards[selectedBoardId], [boards, selectedBoardId])
 
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
@@ -60,8 +61,17 @@ function App() {
 
   const initData = useCallback((data: RootData) => {
     setUsername(data.username)
-    setBackgroundColor(data.backgroundColor)
-    dispatch(linkActions.setLinkGroups(data.linkGroups))
+    let _boards = data?.boards
+    if (!_boards) {
+      _boards = {
+        'default': {
+          id: 'default',
+          title: 'Default',
+          linkGroups: [],
+        },
+      }
+    }
+    dispatch(linkActions.setBoards(_boards))
   }, [dispatch])
 
   const readDataRemote = useCallback(async () => {
@@ -92,14 +102,9 @@ function App() {
   /// WRITE
 
   const saveData = useCallback(async () => {
-    const cleanedLinkGroups = linkGroups.map(group => ({
-      ...group, links: group.links.filter(link => link !== null)
-    }))
-    
     let serializedData = { 
       username, 
-      backgroundColor, 
-      linkGroups: cleanedLinkGroups,
+      boards,
     }
 
     if (Object.keys(serializedData).length === 0) return
@@ -112,7 +117,7 @@ function App() {
 
       if (error) openAlert(error.message, 'error')
     }
-  }, [authSession, authUser, backgroundColor, linkGroups, username])
+  }, [authSession, authUser, boards, username])
   useDebouncedEffect(saveData, 1000, [saveData])
 
 
@@ -123,7 +128,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <DndProvider backend={HTML5Backend}>
-        <SiteWrapper backgroundColor={backgroundColor} textColor={textColor}>
+        <SiteWrapper>
           <ContentWrapper>
           <CustomDragLayer />
             <h1 style={{opacity: '0.15', marginBottom: '16px'}}>{"// New Tab"}</h1>

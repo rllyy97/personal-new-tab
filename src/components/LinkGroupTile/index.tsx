@@ -16,7 +16,7 @@ import { InvisibleInput } from '../../GlobalComponents'
 import { useEffect, useRef, useState } from 'react'
 import { NewLinkData } from '../../EmptyData'
 
-import { actions as linkActions } from '../../app/links/slice'
+import { actions as linkActions } from '../../app/data/slice'
 import { actions as appStatusActions } from '../../app/appStatus/slice'
 import { actions as modalActions } from '../../app/modals/slice'
 import { getDomain } from '../../Utilities'
@@ -25,6 +25,7 @@ import { Identifier } from 'typescript'
 import { getEmptyImage, NativeTypes } from 'react-dnd-html5-backend'
 import { AppState } from '../../app/store'
 import { HandleContext } from '../ContextMenu'
+import { useGroup } from '../../app/appStatus/selectors';
 
 
 export interface LinkGroupProps {
@@ -38,10 +39,8 @@ const LinkGroupTile = (props: LinkGroupProps) => {
   
   const dispatch = useDispatch()
 
-  const group = useSelector((state: AppState) => state.links.linkGroups.find(g => g.id === id))
-  useEffect(() => {
-      setTempTitle(group?.title ?? '')
-  }, [group])
+  const group = useGroup(id)
+  useEffect(() => setTempTitle(group?.title ?? ''), [group])
   
   const [tempTitle, setTempTitle] = useState(title)
   const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId: id, title: tempTitle}))
@@ -99,7 +98,6 @@ const LinkGroupTile = (props: LinkGroupProps) => {
   const [{ canDrop, isOver }, dropUrl] = useDrop(() => ({
     accept: [NativeTypes.URL],
     drop: (item: { urls: string[] }) => {
-      console.log(item)
       addUrl(item.urls[0])
     },
     collect: (monitor: DropTargetMonitor) => ({

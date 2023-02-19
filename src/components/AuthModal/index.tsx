@@ -77,7 +77,6 @@ export const AuthModal = () => {
       password: passwordValue,
     })
     setIsLoading(false)
-    console.log("loginResponse", loginResponse)
     if (loginResponse.error) setErrorValue(loginResponse.error.message)
     else if (loginResponse.data) {
       handleSuccess(loginResponse.data)
@@ -94,7 +93,6 @@ export const AuthModal = () => {
       password: passwordValue,
     })
     setIsLoading(false)
-    console.log("signupResponse", signupResponse)
     if (signupResponse.error) setErrorValue(signupResponse.error.message)
     else if (signupResponse.data) {
       handleSuccess(signupResponse.data)

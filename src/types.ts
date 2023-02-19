@@ -1,9 +1,14 @@
 
 export type RootData = {
   username: string,
-  backgroundColor: string,
-  linkGroups: LinkGroup[],
+  boards: Record<string, Board>,
   lastUpdated: number,
+}
+
+export type Board = {
+  id: string,
+  title: string,
+  linkGroups: LinkGroup[],
 }
 
 export type LinkGroup = {

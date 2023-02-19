@@ -1,12 +1,13 @@
 import { Chip } from "@mui/material"
 import styled, { css } from "styled-components"
+import colors from "./colors"
 
-export const SiteWrapper = styled.div<{backgroundColor: string, textColor: string}>`
+export const SiteWrapper = styled.div`
   position: relative;
   min-height: 100vh;
   height: 100%;
-  color: ${props => props.textColor};
-  background-color: ${props => props.backgroundColor};
+  color: white;
+  background-color: ${colors.background};
   background-size: cover;
   padding: 0 32px;
   overflow: auto;
