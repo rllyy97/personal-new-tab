@@ -31,6 +31,7 @@ export const ChipIconButton = styled(Chip)`
 export const tileDetailing = css`
   box-shadow: 
     0px 0px 1px black,
+    0px 4px 8px #00000020,
     0px 1px 1px 0px #80808030 inset,
     0px -1px 1px 0px #00000040 inset;
 `

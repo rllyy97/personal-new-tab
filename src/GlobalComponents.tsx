@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { tileDetailing } from './styles'
 
 export const FlexDiv = styled.div`
   display: flex;
@@ -22,6 +23,7 @@ export const InvisibleInput = styled.input`
   font-weight: inherit;
   text-align: inherit;
   padding-left: 8px;
+  filter: drop-shadow(0px 0px 4px black);
 `
 
 export const StyledDialog = styled.div`
