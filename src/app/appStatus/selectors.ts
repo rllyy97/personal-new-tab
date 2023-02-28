@@ -11,26 +11,29 @@ export const getDraggedLinkId = createSelector(getAppStatusData, data => data.dr
 
 export const getContextMenuPos = createSelector(getAppStatusData, data => data.contextMenuPos)
 
+export const useSelectedBoard = () => (
+  useSelector((state: AppState) => state.links.boards[state.appStatus.selectedBoardId])
+)
 
 export const useSelectedGroup = () => (
   useSelector((state: AppState) => (
-    state.links.boards[state.links.selectedBoardId].linkGroups?.find(g => g.id === state.appStatus.selectedGroupId)
+    state.links.boards[state.links.activeBoardId]?.linkGroups?.find(g => g.id === state.appStatus.selectedGroupId)
   ))
 )
 export const useGroup = (id: string) => (
   useSelector((state: AppState) => (
-    state.links.boards[state.links.selectedBoardId].linkGroups?.find(g => g.id === id)
+    state.links.boards[state.links.activeBoardId]?.linkGroups?.find(g => g.id === id)
   ))
 )
 
 export const useSelectedLink = () => (
   useSelector((state: AppState) => (
-    state.links.boards[state.links.selectedBoardId].linkGroups?.find(g => g.id === state.appStatus.selectedGroupId)?.links.find(l => l.id === state.appStatus.selectedLinkId)
+    state.links.boards[state.links.activeBoardId]?.linkGroups?.find(g => g.id === state.appStatus.selectedGroupId)?.links.find(l => l.id === state.appStatus.selectedLinkId)
   ))
 )
 
 export const useDraggedLink = () => (
   useSelector((state: AppState) => (
-    state.links.boards[state.links.selectedBoardId].linkGroups?.find(g => g.id === state.appStatus.selectedGroupId)?.links.find(l => l.id === state.appStatus.draggedLinkId)
+    state.links.boards[state.links.activeBoardId]?.linkGroups?.find(g => g.id === state.appStatus.selectedGroupId)?.links.find(l => l.id === state.appStatus.draggedLinkId)
   ))
 )

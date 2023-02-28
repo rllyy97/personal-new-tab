@@ -4,6 +4,7 @@ import { ModalsState } from './interface'
 
 const initialState: ModalsState = {
   appSettingsOpen: false,
+  boardSettingsOpen: false,
   groupSettingsOpen: false,
   linkSettingsOpen: false,
   authOpen: false,
@@ -15,6 +16,7 @@ const modalsSlice = createSlice({
   initialState,
   reducers: {
     toggleAppSettingsModal(state) { state.appSettingsOpen = !state.appSettingsOpen },
+    toggleBoardSettingsModal(state) { state.boardSettingsOpen = !state.boardSettingsOpen },
     toggleGroupSettingsModal(state) { state.groupSettingsOpen = !state.groupSettingsOpen },
     toggleLinkSettingsModal(state) { state.linkSettingsOpen = !state.linkSettingsOpen },
     toggleAuthModal(state) { state.authOpen = !state.authOpen },

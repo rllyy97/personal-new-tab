@@ -1,13 +1,5 @@
 import moment from "moment"
 import { useEffect, useState } from "react"
-import styled from "styled-components"
-
-
-const ClockContainer = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-`
 
 const Clock = () => {
 
@@ -20,9 +12,9 @@ const Clock = () => {
   }, [])
 
   return (
-    <ClockContainer>
+    <div style={{opacity: '0.15'}}>
       <h1>{date.format('hh:mm A')}</h1>
-    </ClockContainer>
+    </div>
   )
 }
 

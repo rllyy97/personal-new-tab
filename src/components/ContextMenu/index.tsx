@@ -10,13 +10,14 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { AppState } from "../../app/store";
 
-export const HandleContext  = (e: React.MouseEvent, dispatch: any, type: ItemType, groupId?: string, linkId?: string) => {
+export const HandleContext  = (e: React.MouseEvent, dispatch: any, type: ItemType, groupId?: string, linkId?: string, boardId?: string) => {
   e.preventDefault();
   e.stopPropagation();
   dispatch(actions.setContextMenuPos({ x: e.clientX + 2, y: e.clientY - 6 }));
   dispatch(actions.setSelectedType(type));
   dispatch(actions.setSelectedLinkId(linkId));
   dispatch(actions.setSelectedGroupId(groupId));
+  dispatch(actions.setSelectedBoardId(boardId));
 }
 
 const ContextMenu = () => {
@@ -27,6 +28,7 @@ const ContextMenu = () => {
   const selectedType = useSelector((state: AppState) => state.appStatus.selectedType);
   const linkId = useSelector((state: AppState) => state.appStatus.selectedLinkId);
   const groupId = useSelector((state: AppState) => state.appStatus.selectedGroupId);
+  const boardId = useSelector((state: AppState) => state.appStatus.selectedBoardId);
 
   const handleClose = () => {
     dispatch(actions.setContextMenuPos(null));
@@ -35,12 +37,14 @@ const ContextMenu = () => {
   const handleConfigure = () => {
     if (selectedType === 'LINK') dispatch(modalActions.toggleLinkSettingsModal());
     else if (selectedType === 'GROUP') dispatch(modalActions.toggleGroupSettingsModal());
+    else if (selectedType === 'BOARD') dispatch(modalActions.toggleBoardSettingsModal());
     handleClose();
   }
 
   const handleDelete = () => {
     if (selectedType === 'LINK') dispatch(linkActions.removeLinkData({groupId, linkId}))
-    if (selectedType === 'GROUP') dispatch(linkActions.removeLinkGroup({groupId}))
+    else if (selectedType === 'GROUP') dispatch(linkActions.removeLinkGroup({groupId}))
+    else if (selectedType === 'BOARD') dispatch(linkActions.deleteBoard(boardId))
     handleClose();
   }
 

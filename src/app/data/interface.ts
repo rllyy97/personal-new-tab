@@ -1,6 +1,6 @@
 import { Board } from "../../types"
 
 export interface DataState {
-  selectedBoardId: string
+  activeBoardId: string
   boards: Record<string, Board>
 }

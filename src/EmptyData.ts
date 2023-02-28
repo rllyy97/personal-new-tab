@@ -1,7 +1,15 @@
 import { v4 as uuid } from 'uuid'
 
-import { LinkData, LinkGroup } from "./types"
+import { Board, LinkData, LinkGroup } from "./types"
 
+export const NewBoard = (id?: string): Board => {
+  if (!id) id = `board-${Date.now()}`
+  return {
+    id,
+    title: `board-${Date.now()}`,
+    linkGroups: [NewLinkGroup()],
+  }
+}
 
 export const NewLinkGroup = (): LinkGroup => ({
   id: uuid(),

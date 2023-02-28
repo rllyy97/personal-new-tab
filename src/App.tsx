@@ -3,31 +3,28 @@ import { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useBoards, useLinkGroups } from './app/data/selectors'
 import { actions as linkActions } from './app/data/slice'
-import Clock from './components/Clock'
 import LinkGroupTile from './components/LinkGroupTile'
 import { FlexDiv } from './GlobalComponents'
 
-import { ChipIconButton, ContentWrapper, SiteWrapper } from './styles'
+import { ContentWrapper, SiteWrapper } from './styles'
 import { RootData } from './types'
 
 import AddIcon from '@mui/icons-material/Add'
 import { theme } from './theme'
 import { LinkSettingsModal } from './components/LinkSettingsModal'
-import { NewLinkGroup } from './EmptyData'
+import { NewBoard } from './EmptyData'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { GroupSettingsModal } from './components/GroupSettingsModal'
 import ContextMenu from './components/ContextMenu'
-import colors from './colors'
 import { CustomDragLayer } from './components/CustomDragLayer/CustomDragLayer'
 import { AuthModal } from './components/AuthModal'
-import { toggleAuthModal, toggleProfileModal } from './app/modals/slice'
 import { useAuthSession, useAuthUser } from './app/auth/selectors'
-import { VpnKey } from '@mui/icons-material'
-import GitHubIcon from '@mui/icons-material/GitHub';
 import { ProfileModal } from './components/ProfileModal'
 import { Supabase } from './supabaseClient'
 import useDebouncedEffect from './hooks/useDebouncedEffect'
+import BoardSettingsModal from './components/BoardSettingsModal'
+import Header from './components/Header'
 
 function App() {
 
@@ -41,8 +38,6 @@ function App() {
 
   const linkGroups = useLinkGroups()
   const boards = useBoards()
-  // const selectedBoardId = useSelectedBoardId()
-  // const selectedBoard = useMemo(() => boards[selectedBoardId], [boards, selectedBoardId])
 
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
@@ -62,15 +57,7 @@ function App() {
   const initData = useCallback((data: RootData) => {
     setUsername(data.username)
     let _boards = data?.boards
-    if (!_boards) {
-      _boards = {
-        'default': {
-          id: 'default',
-          title: 'Default',
-          linkGroups: [],
-        },
-      }
-    }
+    if (!_boards) _boards = {'default': NewBoard('default')}
     dispatch(linkActions.setBoards(_boards))
   }, [dispatch])
 
@@ -131,32 +118,7 @@ function App() {
         <SiteWrapper>
           <ContentWrapper>
           <CustomDragLayer />
-            <h1 style={{opacity: '0.15', marginBottom: '16px'}}>{"// New Tab"}</h1>
-            <div 
-              style={{
-                position: 'absolute',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '16px',
-              }}
-            >
-              <a href={"https://github.com/rllyy97/personal-new-tab"} target="_blank" rel="noopener noreferrer">
-                <ChipIconButton
-                  icon={<GitHubIcon />}
-                  color={'default'}
-                  onClick={() => {}}
-                />
-              </a>
-              <ChipIconButton
-                icon={<VpnKey />} 
-                color={authSession ? 'primary' : 'default'}
-                onClick={() => dispatch(authSession ? toggleProfileModal() : toggleAuthModal())}
-              />
-            </div>
-            <Clock />
+            <Header />
 
             {isAuthLoading ? 
               <CircularProgress style={{margin: '8px auto'}} />
@@ -167,10 +129,8 @@ function App() {
                 <FlexDiv>
                   <Button
                     variant="contained"
-                    onClick={() => dispatch(linkActions.addLinkGroup({linkGroup: NewLinkGroup()}))}
-                    color="primary"
+                    onClick={() => dispatch(linkActions.addLinkGroup())}
                     startIcon={<AddIcon />}
-                    // style={{color: 'black'}}
                   >
                     Add Group
                   </Button>
@@ -183,6 +143,7 @@ function App() {
           {/* Modals */}
           <LinkSettingsModal />
           <GroupSettingsModal />
+          <BoardSettingsModal />
           <AuthModal />
           <ProfileModal />
           {/* Alert */}

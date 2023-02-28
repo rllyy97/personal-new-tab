@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Alert, Button, Dialog, Divider, Typography } from "@mui/material"
+import { Alert, Button, Dialog, Typography } from "@mui/material"
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 import { isProfileOpen } from "../../app/modals/selectors"
@@ -11,6 +11,7 @@ import styled from "styled-components";
 import { setSession, setUser } from "../../app/auth/slice";
 import { useAuthUser } from "../../app/auth/selectors";
 import colors from "../../colors";
+import { setBoards } from "../../app/data/slice";
 
 const AlertFooter = styled(Alert)`
   width: -webkit-fill-available;
@@ -36,6 +37,7 @@ export const ProfileModal = () => {
     setSuccessValue(message)
     dispatch(setUser(null))
     dispatch(setSession(null))
+    dispatch(setBoards({}))
     setTimeout(() => handleClose(), 600)
   }
 
