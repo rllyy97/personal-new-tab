@@ -1,8 +1,8 @@
 import { Alert, Button, CircularProgress, CssBaseline, Snackbar, ThemeProvider } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useBoards, useLinkGroups } from './app/data/selectors'
-import { actions as linkActions } from './app/data/slice'
+import { useBoards, useLinkGroups, useSerializedData } from './app/data/selectors'
+import { actions } from './app/data/slice'
 import LinkGroupTile from './components/LinkGroupTile'
 import { FlexDiv } from './GlobalComponents'
 
@@ -34,10 +34,10 @@ function App() {
   const authUser = useAuthUser()
   const [isAuthLoading, setIsAuthLoading] = useState(false)
 
-  const [username, setUsername] = useState('User')
-
   const linkGroups = useLinkGroups()
   const boards = useBoards()
+
+  const serializedData = useSerializedData()
 
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
@@ -55,10 +55,10 @@ function App() {
   /// READ
 
   const initData = useCallback((data: RootData) => {
-    setUsername(data.username)
+    dispatch(actions.setUsername(data.username));
     let _boards = data?.boards
     if (!_boards) _boards = {'default': NewBoard('default')}
-    dispatch(linkActions.setBoards(_boards))
+    dispatch(actions.setBoards(_boards))
   }, [dispatch])
 
   const readDataRemote = useCallback(async () => {
@@ -89,10 +89,6 @@ function App() {
   /// WRITE
 
   const saveData = useCallback(async () => {
-    let serializedData = { 
-      username, 
-      boards,
-    }
 
     if (
       Object.keys(serializedData).length < 1
@@ -133,7 +129,7 @@ function App() {
     }
 
     
-  }, [authSession, authUser, boards, username])
+  }, [authSession, authUser, boards, serializedData])
   useDebouncedEffect(saveData, 1000, [saveData])
 
   /////////////////////////////////////////////////////////
@@ -157,7 +153,7 @@ function App() {
                 <FlexDiv>
                   <Button
                     variant="contained"
-                    onClick={() => dispatch(linkActions.addLinkGroup())}
+                    onClick={() => dispatch(actions.addLinkGroup())}
                     startIcon={<AddIcon />}
                   >
                     Add Group

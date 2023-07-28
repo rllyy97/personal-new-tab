@@ -12,6 +12,7 @@ import { setSession, setUser } from "../../app/auth/slice";
 import { useAuthSession, useAuthUser } from "../../app/auth/selectors";
 import colors from "../../colors";
 import { setBoards } from "../../app/data/slice";
+import { useSerializedData, useUsername } from "../../app/data/selectors";
 
 const AlertFooter = styled(Alert)`
   width: -webkit-fill-available;
@@ -25,6 +26,8 @@ export const ProfileModal = () => {
 
   const authSession = useAuthSession()
   const authUser = useAuthUser()
+
+  const serializedData = useSerializedData()
   
   const isOpen = useSelector(isProfileOpen)
   const handleClose = () => {
@@ -39,12 +42,18 @@ export const ProfileModal = () => {
     dispatch(setUser(null))
     dispatch(setSession(null))
     dispatch(setBoards({}))
-    setTimeout(() => handleClose(), 600)
+    setTimeout(handleClose, 600)
   }
 
-  const handleRestoreSuccess = (message: string) => {
+  const handleBackupSuccess = () => {
     setErrorValue('')
-    setSuccessValue(message)
+    setSuccessValue('Backup saved')
+    setTimeout(clearState, 600)
+  }
+
+  const handleRestoreSuccess = () => {
+    setErrorValue('')
+    setSuccessValue('Data restored')
     setTimeout(() => {
       // Refresh the page
       window.location.reload()
@@ -80,7 +89,7 @@ export const ProfileModal = () => {
 
   // Try to delete account from supabase
   const deleteAccount = useCallback(async () => {
-    if (!authUser?.id) return
+    if (!authSession || !authUser?.id) return
     setIsLoading(true)
     const deleteResponse = await Supabase.rpc('userDeleteSelf')
     if (deleteResponse.error) {
@@ -92,16 +101,38 @@ export const ProfileModal = () => {
     }
   }, [])
 
+  const saveBackup = useCallback(async () => {
+    if (!authSession || !authUser?.id) return
+    setIsLoading(true)
+
+    try {
+      const { error } = await Supabase
+        .from('user_data')
+        .update({
+          backup_data: serializedData,
+          backup_updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', authSession.user.id)
+
+      if (error) throw error?.message
+      handleBackupSuccess()
+    } catch (error: any) {
+      setIsLoading(false)
+      console.error(error)
+      setErrorValue(error)
+    }
+  }, [authUser]);
+
   const restoreBackup = useCallback(async () => {
     if (!authSession || !authUser?.id) return
     setIsLoading(true)
 
     try {
       const { data } = await Supabase
-      .from('user_data')
-      .select('backup_data')
-      .eq('user_id', authSession.user.id)
-      .single()
+        .from('user_data')
+        .select('backup_data')
+        .eq('user_id', authSession.user.id)
+        .single()
 
       const backupData = data?.backup_data
 
@@ -116,7 +147,7 @@ export const ProfileModal = () => {
         .eq('user_id', authSession.user.id)
 
       if (error) throw error?.message
-      handleRestoreSuccess('Data restored')
+      handleRestoreSuccess()
     } catch (error: any) {
       setIsLoading(false)
       console.error(error)
@@ -161,6 +192,14 @@ export const ProfileModal = () => {
               size="small"
             >
               Delete Account
+            </Button>
+            <Button 
+              disabled={disableInput}
+              color="info" 
+              onClick={saveBackup}
+              size="small"
+            >
+              Save backup
             </Button>
             <Button 
               disabled={disableInput}

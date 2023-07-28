@@ -5,6 +5,7 @@ import { DataState } from './interface'
 import { NewBoard, NewLinkGroup } from '../../EmptyData'
 
 const initialState: DataState = {
+  username: '',
   activeBoardId: '',
   boards: {},
 }
@@ -13,6 +14,9 @@ const dataSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
+    setUsername(state, action) {
+      state.username = action.payload
+    },
     setBoards(state, action) {
       state.boards = action.payload
     },
@@ -113,7 +117,8 @@ const dataSlice = createSlice({
 })
 
 export const { name, actions, reducer } = dataSlice
-export const { 
+export const {
+  setUsername,
   setBoards, 
   setActiveBoardId, 
   addNewBoard, 
