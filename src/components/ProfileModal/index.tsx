@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Alert, Button, Dialog, Typography } from "@mui/material"
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
@@ -9,7 +9,7 @@ import { StyledDialog } from "../../GlobalComponents"
 import { Supabase } from "../../supabaseClient"
 import styled from "styled-components";
 import { setSession, setUser } from "../../app/auth/slice";
-import { useAuthUser } from "../../app/auth/selectors";
+import { useAuthSession, useAuthUser } from "../../app/auth/selectors";
 import colors from "../../colors";
 import { setBoards } from "../../app/data/slice";
 
@@ -23,7 +23,8 @@ export const ProfileModal = () => {
 
   const dispatch = useDispatch()
 
-  const user = useAuthUser()
+  const authSession = useAuthSession()
+  const authUser = useAuthUser()
   
   const isOpen = useSelector(isProfileOpen)
   const handleClose = () => {
@@ -32,13 +33,22 @@ export const ProfileModal = () => {
     setTimeout(() => clearState(), 200)
   }
 
-  const handleSuccess = (message: string) => {
+  const handleDeleteSuccess = (message: string) => {
     setErrorValue('')
     setSuccessValue(message)
     dispatch(setUser(null))
     dispatch(setSession(null))
     dispatch(setBoards({}))
     setTimeout(() => handleClose(), 600)
+  }
+
+  const handleRestoreSuccess = (message: string) => {
+    setErrorValue('')
+    setSuccessValue(message)
+    setTimeout(() => {
+      // Refresh the page
+      window.location.reload()
+    }, 600)
   }
 
   const clearState = () => {
@@ -62,15 +72,15 @@ export const ProfileModal = () => {
       setIsLoading(false)
       setErrorValue(logoutResponse.error.message)
     } else {
-      handleSuccess('Logged out')
+      handleDeleteSuccess('Logged out')
     }
   }
 
   const [tryingToDeleteAccount, setTryingToDeleteAccount] = useState(false)
 
   // Try to delete account from supabase
-  const deleteAccount = async () => {
-    if (!user?.id) return
+  const deleteAccount = useCallback(async () => {
+    if (!authUser?.id) return
     setIsLoading(true)
     const deleteResponse = await Supabase.rpc('userDeleteSelf')
     if (deleteResponse.error) {
@@ -78,9 +88,41 @@ export const ProfileModal = () => {
       console.error(deleteResponse)
       setErrorValue(deleteResponse.error.message)
     } else {
-      handleSuccess('Account deleted')
+      handleDeleteSuccess('Account deleted')
     }
-  }
+  }, [])
+
+  const restoreBackup = useCallback(async () => {
+    if (!authSession || !authUser?.id) return
+    setIsLoading(true)
+
+    try {
+      const { data } = await Supabase
+      .from('user_data')
+      .select('backup_data')
+      .eq('user_id', authSession.user.id)
+      .single()
+
+      const backupData = data?.backup_data
+
+      if (!backupData) throw new Error('No backup data found')
+
+      const { error } = await Supabase
+        .from('user_data')
+        .update({
+          data: backupData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', authSession.user.id)
+
+      if (error) throw error?.message
+      handleRestoreSuccess('Data restored')
+    } catch (error: any) {
+      setIsLoading(false)
+      console.error(error)
+      setErrorValue(error)
+    }
+  }, [authUser])
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -98,7 +140,7 @@ export const ProfileModal = () => {
             textDecorationStyle: 'wavy',
             textDecorationColor: colors.darkGreen,
           }}>
-            {user?.email}
+            {authUser?.email}
           </Typography>
         </div>
 
@@ -120,33 +162,50 @@ export const ProfileModal = () => {
             >
               Delete Account
             </Button>
+            <Button 
+              disabled={disableInput}
+              color="info" 
+              onClick={restoreBackup}
+              size="small"
+            >
+              Restore backup
+            </Button>
           </>
         ) : (
-          <div style={{
-            background: colors.red,
-            padding: '48px 16px',
-            borderRadius: '8px',
-            display: 'flex',
-            gap: '16px',
-            alignItems: 'center',
-            flexDirection: 'column',
-            textAlign: 'center',
-            width: '100%',
-          }}>
-            <p>
-              This action is irreversible, <br />
-              and all of your data will be deleted.
-            </p>
-            <Button
-              disabled={disableInput}
-              variant="contained"
-              onClick={deleteAccount}
-              color="error"
-              style={{background: colors.backgroundLight}}
+          <>
+            <div style={{
+              background: colors.red,
+              padding: '48px 16px',
+              borderRadius: '8px',
+              display: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              flexDirection: 'column',
+              textAlign: 'center',
+              width: '100%',
+            }}>
+              <p>
+                This action is irreversible, <br />
+                and all of your data will be deleted.
+              </p>
+              <Button
+                disabled={disableInput}
+                variant="contained"
+                onClick={deleteAccount}
+                color="error"
+                style={{background: colors.backgroundLight}}
+              >
+                Delete Account
+              </Button>
+            </div>
+            <Button 
+              variant="outlined"
+              color="primary"
+              onClick={() => setTryingToDeleteAccount(false)}
             >
-              Delete Account
+              Cancel
             </Button>
-          </div>
+          </>
         )}
 
         {/* Error message */}

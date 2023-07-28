@@ -26,15 +26,15 @@
     "react-dnd-html5-backend": "^15.1.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
-    "react-scripts": "5.0.0",
     "styled-components": "^5.3.3",
     "typescript": "^4.6.2",
     "uuidv4": "^6.2.12",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "yarn build",
@@ -57,5 +57,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.3",
+    "vite": "^4.4.7",
+    "vite-tsconfig-paths": "^4.2.0"
   }
 }

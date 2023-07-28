@@ -94,19 +94,47 @@ function App() {
       boards,
     }
 
-    if (Object.keys(serializedData).length === 0) return
+    if (
+      Object.keys(serializedData).length < 1
+      || Object.keys(serializedData?.boards).length < 1
+    ) return
 
-    if (authSession && authUser) {
-      const { error } = await Supabase.from('user_data').update({
-        data: serializedData,
-        updated_at: new Date().toISOString()
-      }).eq('user_id', authSession.user.id)
+    if (!authSession || !authUser) return
 
-      if (error) openAlert(error.message, 'error')
+    let shouldSaveBackup = false
+    const { data } = await Supabase
+      .from('user_data')
+      .select('backup_updated_at')
+      .eq('user_id', authSession.user.id)
+      .single()
+    const lastBackupTimestamp = new Date(data?.backup_updated_at)
+    const currentTimestamp = new Date()
+    // if it's been more than 7 days, set shouldSaveBackup to true
+    if (currentTimestamp.getTime() - lastBackupTimestamp.getTime() > 604800000) {
+      shouldSaveBackup = true
     }
+
+    const { error } = await Supabase
+      .from('user_data')
+      .update({
+        data: serializedData,
+        updated_at: new Date().toISOString(),
+        ...(shouldSaveBackup ? {
+          backup_data: serializedData,
+          backup_updated_at: new Date().toISOString(),
+        } : {})
+      })
+      .eq('user_id', authSession.user.id)
+
+    if (error) openAlert(error.message, 'error')
+
+    if (shouldSaveBackup) {
+      openAlert('Saved backup', 'info')
+    }
+
+    
   }, [authSession, authUser, boards, username])
   useDebouncedEffect(saveData, 1000, [saveData])
-
 
   /////////////////////////////////////////////////////////
   /// RENDER
