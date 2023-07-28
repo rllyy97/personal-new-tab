@@ -32,7 +32,7 @@ export const GroupSettingsModal = () => {
   const [tempTitle, setTempTitle] = useState('')
   const updateTitle = () => dispatch(linkActions.updateLinkGroup({groupId, title: tempTitle}))
   const updateTileStyle = (e: any) => dispatch(linkActions.updateLinkGroup({groupId, tileStyle: e.target.value}))
-  const toggleHideTitle = () => dispatch(linkActions.updateLinkGroup({groupId, hideTitle: !group?.hideTitle}))
+  const toggleHideTitles = () => dispatch(linkActions.updateLinkGroup({groupId, hideTitle: !group?.hideTitle}))
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -62,8 +62,8 @@ export const GroupSettingsModal = () => {
           ))}
         </Select>
         <FormControlLabel
-          control={<Checkbox checked={group?.hideTitle ?? false} onChange={toggleHideTitle} />}
-          label="Hide Title"
+          control={<Checkbox checked={group?.hideTitle ?? false} onChange={toggleHideTitles} />}
+          label="Hide Titles"
         />
       </StyledDialog>
     </Dialog>

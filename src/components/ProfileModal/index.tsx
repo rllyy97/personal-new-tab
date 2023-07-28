@@ -121,7 +121,7 @@ export const ProfileModal = () => {
       console.error(error)
       setErrorValue(error)
     }
-  }, [authUser]);
+  }, [authUser, serializedData]);
 
   const restoreBackup = useCallback(async () => {
     if (!authSession || !authUser?.id) return

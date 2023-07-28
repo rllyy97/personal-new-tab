@@ -35,9 +35,8 @@ function App() {
   const [isAuthLoading, setIsAuthLoading] = useState(false)
 
   const linkGroups = useLinkGroups()
-  const boards = useBoards()
 
-  const serializedData = useSerializedData()
+  const serializedData: any = useSerializedData()
 
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
@@ -123,13 +122,9 @@ function App() {
       .eq('user_id', authSession.user.id)
 
     if (error) openAlert(error.message, 'error')
+    else if (shouldSaveBackup) openAlert('Saved backup', 'info')
 
-    if (shouldSaveBackup) {
-      openAlert('Saved backup', 'info')
-    }
-
-    
-  }, [authSession, authUser, boards, serializedData])
+  }, [authSession, authUser, serializedData])
   useDebouncedEffect(saveData, 1000, [saveData])
 
   /////////////////////////////////////////////////////////

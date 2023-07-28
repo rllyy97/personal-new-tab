@@ -53,13 +53,13 @@ export const AuthModal = () => {
   }
 
   const clearState = () => {
-    setUsernameValue('')
+    setEmailValue('')
     setPasswordValue('')
     setErrorValue('')
     setSuccessValue('')
   }
 
-  const [usernameValue, setUsernameValue] = useState('')
+  const [emailValue, setEmailValue] = useState('')
   const [passwordValue, setPasswordValue] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -73,7 +73,7 @@ export const AuthModal = () => {
     setErrorValue('')
     setIsLoading(true)
     const loginResponse = await Supabase.auth.signInWithPassword({
-      email: usernameValue,
+      email: emailValue,
       password: passwordValue,
     })
     setIsLoading(false)
@@ -89,7 +89,7 @@ export const AuthModal = () => {
     setErrorValue('')
     setIsLoading(true)
     const signupResponse = await Supabase.auth.signUp({
-      email: usernameValue,
+      email: emailValue,
       password: passwordValue,
     })
     setIsLoading(false)
@@ -110,15 +110,15 @@ export const AuthModal = () => {
           </Typography>
         </div>
         <FormControl fullWidth required>
-          <InputLabel htmlFor="username-field">Username</InputLabel>
+          <InputLabel htmlFor="email-field">Email</InputLabel>
           <OutlinedInput
-            id="username-field"
+            id="email-field"
             disabled={disableInput}
             fullWidth
-            label="Username"
-            value={usernameValue}
-            onChange={(e) => setUsernameValue(e.target.value)}
-            error={!!errorValue && !usernameValue}
+            label="Email"
+            value={emailValue}
+            onChange={(e) => setEmailValue(e.target.value)}
+            error={!!errorValue && !emailValue}
           />
         </FormControl>
         <FormControl fullWidth required>
