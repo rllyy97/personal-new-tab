@@ -34,8 +34,6 @@ const BoardSelection = () => {
     dispatch(setActiveBoardId(Object.keys(boards)[0]))
   }, [activeBoardId, boards, dispatch])
 
-  if (Object.keys(boards).length === 0) return null
-
   return (
     <FlexDiv style={{
       borderRadius: '48px', 
