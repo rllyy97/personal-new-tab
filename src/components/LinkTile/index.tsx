@@ -36,7 +36,7 @@ const LinkTile = (props: LinkTileProps) => {
 
   ///
 
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLAnchorElement>(null)
   const [, drop] = useDrop<
     LinkTileProps,
     void,
@@ -87,12 +87,12 @@ const LinkTile = (props: LinkTileProps) => {
 
   return (
     <a
+      ref={ref}
       href={(url as string).startsWith('http') ? url : `http://${url}`}
       onDragStart={selectIds}
       onContextMenu={(e) => HandleContext(e, dispatch, 'LINK', groupId, id)}
     >
       <LinkContainer
-        ref={ref}
         id={id}
         className={tileStyle}
         onMouseEnter={() => setHasHover(true)}
