@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { LinkData } from '../../types'
+import { LinkData, NoteData } from '../../types'
 
 import { DataState } from './interface'
-import { NewBoard, NewLinkGroup } from '../../EmptyData'
+import { NewBoard, NewLinkGroup, NewNoteData } from '../../EmptyData'
 
 const initialState: DataState = {
   username: '',
@@ -62,6 +62,12 @@ const dataSlice = createSlice({
       const group = state.boards[state.activeBoardId].linkGroups.find(g => g.id === action.payload.groupId)
       if (group) group.links.push(action.payload.linkData)
     },
+    addNoteData(state) {
+      if (!state.boards[state.activeBoardId].notes) {
+        state.boards[state.activeBoardId].notes = []
+      }
+      state.boards[state.activeBoardId].notes.push(NewNoteData())
+    },
 
     updateLinkGroup(state, action) {
       const groupIndex = state.boards[state.activeBoardId].linkGroups.findIndex(g => g.id === action.payload.groupId)
@@ -77,6 +83,13 @@ const dataSlice = createSlice({
       if (linkIndex === -1) return
       Object.keys(action.payload).forEach(key => {
         (state.boards[state.activeBoardId].linkGroups[groupIndex].links[linkIndex] as LinkData)[key] = action.payload[key]
+      });
+    },
+    updateNoteData(state, action) {
+      const noteIndex = state.boards[state.activeBoardId].notes.findIndex(n => n.id === action.payload.id)
+      if (noteIndex === -1) return
+      Object.keys(action.payload).forEach(key => {
+        (state.boards[state.activeBoardId].notes[noteIndex] as NoteData)[key] = action.payload[key]
       });
     },
 
@@ -99,6 +112,11 @@ const dataSlice = createSlice({
       const group = state.boards[state.activeBoardId].linkGroups.splice(fromIndex, 1)[0]
       state.boards[state.activeBoardId].linkGroups.splice(toIndex, 0, group)
     },
+    moveNoteData(state, action) {
+      const { fromIndex, toIndex } = action.payload
+      const note = state.boards[state.activeBoardId].notes.splice(fromIndex, 1)[0]
+      state.boards[state.activeBoardId].notes.splice(toIndex, 0, note)
+    },
 
     removeLinkGroup(state, action) {
       const groupIndex = state.boards[state.activeBoardId].linkGroups.findIndex(g => g.id === action.payload.groupId)
@@ -113,24 +131,33 @@ const dataSlice = createSlice({
       if (linkIndex === -1) return
       group.links.splice(linkIndex, 1)
     },
+    removeNoteData(state, action) {
+      const noteIndex = state.boards[state.activeBoardId].notes.findIndex(n => n.id === action.payload.id)
+      if (noteIndex === -1) return
+      state.boards[state.activeBoardId].notes.splice(noteIndex, 1)
+    }
   }
 })
 
 export const { name, actions, reducer } = dataSlice
 export const {
   setUsername,
-  setBoards, 
-  setActiveBoardId, 
-  addNewBoard, 
-  updateBoard, 
+  setBoards,
+  setActiveBoardId,
+  addNewBoard,
+  updateBoard,
   deleteBoard,
-  setLinkGroups, 
-  addLinkGroup, 
-  addLinkData, 
-  updateLinkGroup, 
-  updateLinkData, 
-  moveLinkData, 
-  moveLinkGroup, 
-  removeLinkGroup, 
-  removeLinkData 
+  setLinkGroups,
+  addLinkGroup,
+  addLinkData,
+  addNoteData,
+  updateLinkGroup,
+  updateLinkData,
+  updateNoteData,
+  moveLinkData,
+  moveLinkGroup,
+  moveNoteData,
+  removeLinkGroup,
+  removeLinkData,
+  removeNoteData,
 } = actions

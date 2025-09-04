@@ -1,5 +1,18 @@
 import { Chip } from "@mui/material"
-import styled, { css } from "styled-components"
+import styled, { css, keyframes } from "styled-components"
+
+export const loadAnimation = keyframes`
+  0% {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(-24px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+`
 
 export const SiteWrapper = styled.div`
   position: relative;

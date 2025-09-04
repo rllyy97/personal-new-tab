@@ -1,7 +1,7 @@
 import { Alert, Button, CircularProgress, CssBaseline, Snackbar, ThemeProvider } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useBoards, useLinkGroups, useSerializedData } from './app/data/selectors'
+import { useLinkGroups, useNotes, useSerializedData } from './app/data/selectors'
 import { actions } from './app/data/slice'
 import LinkGroupTile from './components/LinkGroupTile'
 import { FlexDiv } from './GlobalComponents'
@@ -25,6 +25,7 @@ import { Supabase } from './supabaseClient'
 import useDebouncedEffect from './hooks/useDebouncedEffect'
 import BoardSettingsModal from './components/BoardSettingsModal'
 import Header from './components/Header'
+import NoteGroupTile from './components/NoteGroupTile'
 
 function App() {
 
@@ -143,6 +144,8 @@ function App() {
               <CircularProgress style={{margin: '8px auto'}} />
             : authSession &&
               <>
+                <NoteGroupTile />
+
                 {linkGroups.map((group, index) => <LinkGroupTile key={group.id} index={index} linkGroup={group} />)}
 
                 <FlexDiv>

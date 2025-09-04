@@ -9,6 +9,7 @@ export type Board = {
   id: string,
   title: string,
   linkGroups: LinkGroup[],
+  notes: NoteData[],
 }
 
 export type LinkGroup = {
@@ -29,6 +30,13 @@ export type LinkData = {
   imageUrl: string
   visitCount: number
 }
+
+export type NoteData = {
+  [key: string]: any,
+  id: string,
+  text: string,
+  important?: boolean,
+};
 
 ///
 

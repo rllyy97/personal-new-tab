@@ -26,6 +26,24 @@ export const InvisibleInput = styled.input`
   filter: drop-shadow(0px 0px 4px black);
 `
 
+export const InvisibleInputMultiline = styled.textarea`
+  width: fit-content;
+  border: none;
+  outline: none;
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  padding: none;
+  width: auto;
+  background-color: transparent;
+  color: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+  padding-left: 8px;
+  filter: drop-shadow(0px 0px 4px black);
+  field-sizing: content;
+`
+
 export const StyledDialog = styled.div`
   min-width: 420px;
   padding: 32px 24px;
