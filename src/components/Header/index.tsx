@@ -14,10 +14,12 @@ const Header = () => {
   const authSession = useAuthSession()
   const dispatch = useDispatch()
 
+	const projectVersion = APP_VERSION ?? 'dev'
+
   return (
     <FlexDiv style={{justifyContent: 'space-between', marginBottom: '16px'}}>
       <FlexDiv style={{gap: '32px'}}>
-        <h1 style={{opacity: '0.15'}}>{"// New Tab"}</h1>
+        <h1 style={{opacity: '0.15'}} title={projectVersion}>{"// New Tab"}</h1>
         <BoardSelection />
       </FlexDiv>
       <FlexDiv style={{gap: '16px'}}>

@@ -57,3 +57,7 @@ a {
 .MuiButton-root {
   border-radius: 24px !important;
 }
+
+canvas {
+  z-index: 9999 !important; 
+}

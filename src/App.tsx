@@ -26,6 +26,7 @@ import useDebouncedEffect from './hooks/useDebouncedEffect'
 import BoardSettingsModal from './components/BoardSettingsModal'
 import Header from './components/Header'
 import NoteGroupTile from './components/NoteGroupTile'
+import { Birthday } from './components/Birthday'
 
 function App() {
 
@@ -140,10 +141,12 @@ function App() {
           <CustomDragLayer />
             <Header />
 
-            {isAuthLoading ? 
+            {isAuthLoading ? (
               <CircularProgress style={{margin: '8px auto'}} />
-            : authSession &&
+						) : authSession && (
               <>
+								<Birthday />
+
                 <NoteGroupTile />
 
                 {linkGroups.map((group, index) => <LinkGroupTile key={group.id} index={index} linkGroup={group} />)}
@@ -158,7 +161,7 @@ function App() {
                   </Button>
                 </FlexDiv>
               </>
-            }
+            )}
 
             <ContextMenu />
           </ContentWrapper>

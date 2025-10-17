@@ -1,7 +1,7 @@
 {
   "homepage": "http://rllyy97.github.io/personal-new-tab",
   "name": "personal-new-tab",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -26,6 +26,7 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.13",
     "@types/styled-components": "^5.1.24",
+    "canvas-confetti": "^1.9.3",
     "gh-pages": "^3.2.3",
     "moment": "^2.29.1",
     "react": "^17.0.2",
@@ -57,6 +58,7 @@
     ]
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@vitejs/plugin-react": "^4.0.3",
     "vite": "^4.4.7",
     "vite-tsconfig-paths": "^4.2.0"

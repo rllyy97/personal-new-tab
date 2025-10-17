@@ -6,6 +6,7 @@ export default defineConfig(() => {
     base: '/personal-new-tab/',
     define: {
       'process.env': {},
+			APP_VERSION: JSON.stringify(process.env.npm_package_version),
     },
     build: {
       outDir: 'build',
