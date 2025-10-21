@@ -117,6 +117,7 @@ export const BirthdayEffectsContainer = styled.div`
 	background-color: #000000B0;
 	z-index: 100;
 	border: 40px solid red;
+	pointer-events: none;
 	user-select: none;
 	animation: ${birthdayRainbow} 1s linear;
 	animation-iteration-count: infinite;

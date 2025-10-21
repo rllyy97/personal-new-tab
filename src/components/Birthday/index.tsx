@@ -3,6 +3,7 @@ import confetti from "canvas-confetti";
 
 import { BirthdayButton, BirthdayEffectsContainer, BirthdayEffectsContent } from "./styles";
 import useInterval from "../../hooks/useInterval";
+import catGif from '../../images/cat.gif';
 
 
 export const Birthday = () => {
@@ -24,7 +25,7 @@ export const Birthday = () => {
 	if (todayIsBirthday) {
 		return (
 			<>
-				<BirthdayButton 
+				<BirthdayButton
 					onMouseDown={() => setBirthdayEffectsOpen(true)}
 					onMouseUp={() => setBirthdayEffectsOpen(false)}
 					onMouseLeave={() => setBirthdayEffectsOpen(false)}
@@ -66,11 +67,11 @@ export const BirthdayEffects = (props: any) => {
 		<BirthdayEffectsContainer>
 			<BirthdayEffectsContent>
 				<div>
-					<img src="/assets/cat.gif" alt="Cat" />
+					<img src={catGif} alt="Cat" />
 				</div>
 				<p>HAPPY BIRTHDAY</p>
 				<div>
-					<img src="/assets/cat.gif" alt="Cat" />
+					<img src={catGif} alt="Cat" />
 				</div>
 			</BirthdayEffectsContent>
 		</BirthdayEffectsContainer>
